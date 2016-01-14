@@ -1,0 +1,5 @@
+package dev.research.himanshu.algorithm.dynamicprogramming;
+
+public class MaxFrequencyInArray {
+
+}

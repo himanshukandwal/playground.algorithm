@@ -1,0 +1,27 @@
+package dev.research.himanshu.algorithm.dynamicprogramming;
+
+public class MaxValueContiguousSubsequence {
+	
+	private int[] inputSequence;
+	
+	public MaxValueContiguousSubsequence() {}
+
+	public MaxValueContiguousSubsequence(int[] inputSequence) {
+		this.inputSequence = inputSequence;
+	}
+	
+	public int[] getInputSequence() {
+		return inputSequence;
+	}
+	
+	public int[] getMaxSequenceSubsequence() {
+		if (getInputSequence() == null || getInputSequence().length == 0) {
+			return null;
+		}
+		
+		int[] maxSubsequence = new int[getInputSequence().length];
+		
+		return maxSubsequence;
+	}
+	
+}
