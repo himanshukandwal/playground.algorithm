@@ -1,0 +1,15 @@
+package dev.research.himanshu.algorithm.dynamicprogramming;
+
+import junit.framework.TestCase;
+
+public class MaxValueContiguousSubsequenceTest extends TestCase {
+
+	protected void setUp() throws Exception {
+		super.setUp();
+	}
+
+	public void testGetMaxSequenceSubsequence() {
+		fail("Not yet implemented");
+	}
+
+}

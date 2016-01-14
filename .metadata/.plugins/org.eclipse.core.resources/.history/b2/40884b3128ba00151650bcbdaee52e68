@@ -1,0 +1,61 @@
+package dev.research.himanshu.algorithm.dynamicprogramming;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Given a sequence of n real numbers A(1) ... A(n), determine a contiguous subsequence A(i) ... A(j) for which the sum of elements in the subsequence is maximized.
+ * @author Himanshu Kandwal
+ */
+public class MaxValueContiguousSubsequence {
+	
+	private int[] inputSequence;
+	
+	public MaxValueContiguousSubsequence() {}
+
+	public MaxValueContiguousSubsequence(int[] inputSequence) {
+		this.inputSequence = inputSequence;
+	}
+	
+	public void setInputSequence(int[] inputSequence) {
+		this.inputSequence = inputSequence;
+	}
+	
+	public int[] getInputSequence() {
+		return inputSequence;
+	}
+	
+	public Integer[] getMaxSequenceSubsequence() {
+		if (getInputSequence() == null || getInputSequence().length == 0) {
+			System.out.println(" No data present in input sequence !");
+			return null;
+		}
+		
+		int maxSum;
+		int start, end = 0;
+		
+		int j = 0;
+		int maxSum, runningSum = getInputSequence()[0];
+		
+		for (int index = 1; index < getInputSequence().length; index ++) {
+			int currentValue = getInputSequence() [index];
+			
+			if (runningSum + currentValue > currentValue) {
+				runningSum
+			} else {
+				
+			}
+			
+			if (sum > sum + currentValue) {
+				sum = 0;
+				maxSubsequence.clear();
+			} else {
+				sum += currentValue;
+			}
+			maxSubsequence.add(currentValue);
+		}
+		
+		return maxSubsequence.toArray(new Integer[0]);
+	}
+	
+}

@@ -1,0 +1,55 @@
+package dev.research.himanshu.algorithm.dynamicprogramming;
+
+import java.util.Arrays;
+
+public class MaxFrequencyInArray {
+	
+	private int[] inputSequence;
+	
+	public MaxFrequencyInArray() {}
+
+	public MaxFrequencyInArray(int[] inputSequence) {
+		this.inputSequence = inputSequence;
+	}
+	
+	public void setInputSequence(int[] inputSequence) {
+		this.inputSequence = inputSequence;
+	}
+	
+	public int[] getInputSequence() {
+		return inputSequence;
+	}
+	
+	public int[] getMaxFrequency() {
+		if (getInputSequence() == null || getInputSequence().length == 0) {
+			System.out.println(" No data present in input sequence !");
+			return null;
+		}
+		
+		int maxCount, runningCount, maxNumber;
+		int[][] maxFreqArr = new int[10][10];
+		
+		
+		
+		for (int index = 1; index < getInputSequence().length; index ++) {
+			int currentValue = getInputSequence() [index];
+			
+			if (runningSum + currentValue > currentValue) {
+				runningSum += currentValue;
+			} else {
+				runningSum = currentValue;
+				j = index;
+			}
+			
+			if (maxSum < runningSum) {
+				maxSum = runningSum;
+				start = j;
+				end = index;
+			}
+		}
+		
+		System.out.println(" Max sum : " + maxSum + " , Substring range : " + start + " , " + end);
+		return Arrays.copyOfRange(getInputSequence(), start, end + 1);
+	}
+	
+}
