@@ -1,7 +1,6 @@
 package dev.research.himanshu.algorithm.assignments.assignment1;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -92,7 +91,7 @@ public class LinkedListSetOperations {
 
 	public static <T extends Comparable<? super T>> void difference(List<T> l1, List<T> l2, List<T> outList) {
 		if (l1.size() > 0) {
-			if (l2.size() < 0) {
+			if (l2.size() == 0) {
 				outList.addAll(l1);
 				return;
 			}
@@ -155,31 +154,76 @@ public class LinkedListSetOperations {
 	}
 
 	public static void main(String[] args) {
-		List<Integer> listOne = Arrays.asList(1, 2, 3, 4, 5, 6);
-		List<Integer> listTwo = Arrays.asList(0, 4, 5, 6, 7, 8, 9);
+		checkIntersection(1000000, 50);
+		checkIntersection(5000000, 150);
+		checkIntersection(10000000, 150);
+		
+		checkUnion(1000000, 50);
+		checkUnion(5000000, 150);
+		checkUnion(10000000, 150);
+		
+		checkDifference(1000000);
+		checkDifference(5000000);
+		checkDifference(10000000);
+	}
+
+	private static void checkIntersection(int range, int offset) {
+		List<Integer> integerListOne = new ArrayList<Integer>(range);
+		List<Integer> integerListTwo = new ArrayList<Integer>(range);
+
+		for (int index = 0; index < range; index++)
+			integerListOne.add(index);
+
+		for (int index = range - offset; index < 2 * range + offset; index++)
+			integerListTwo.add(index);
 
 		List<Integer> outputList = new ArrayList<Integer>();
-		intersect(listOne, listTwo, outputList);
 
-		for (Integer integer : outputList) {
-			System.out.println(integer);
-		}
+		System.out.println("\n ------------------ ");
+		System.out.println("Checking intersection for elements of size - " + range);
+		timer();
+		intersect(integerListOne, integerListTwo, outputList);
+		timer();
+		System.out.println("output list size : " + outputList.size());
 		System.out.println(" ------------------ ");
+	}
 
-		outputList.clear();
-		union(listOne, listTwo, outputList);
+	private static void checkUnion(int range, int offset) {
+		List<Integer> integerListOne = new ArrayList<Integer>(range);
+		List<Integer> integerListTwo = new ArrayList<Integer>(range);
 
-		for (Integer integer : outputList) {
-			System.out.println(integer);
-		}
+		for (int index = 0; index < range; index++)
+			integerListOne.add(index);
+
+		for (int index = offset; index < range + offset; index++)
+			integerListTwo.add(index);
+
+		List<Integer> outputList = new ArrayList<Integer>();
+
+		System.out.println("\n ------------------ ");
+		System.out.println("Checking union for elements of size - " + range);
+		timer();
+		union(integerListOne, integerListTwo, outputList);
+		timer();
+		System.out.println("output list size : " + outputList.size());
 		System.out.println(" ------------------ ");
+	}
+	
+	private static void checkDifference(int range) {
+		List<Integer> integerListOne = new ArrayList<Integer>(range);
+		List<Integer> integerListTwo = new ArrayList<Integer>(range);
 
-		outputList.clear();
-		difference(listTwo, listOne, outputList);
+		for (int index = 0; index < range; index++)
+			integerListOne.add(index);
 
-		for (Integer integer : outputList) {
-			System.out.println(integer);
-		}
+		List<Integer> outputList = new ArrayList<Integer>();
+
+		System.out.println("\n ------------------ ");
+		System.out.println("Checking difference for elements of size - " + range);
+		timer();
+		difference(integerListOne, integerListTwo, outputList);
+		timer();
+		System.out.println("output list size : " + outputList.size());
 		System.out.println(" ------------------ ");
 	}
 
