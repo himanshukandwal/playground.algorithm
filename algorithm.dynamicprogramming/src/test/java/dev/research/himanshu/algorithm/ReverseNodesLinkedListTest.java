@@ -49,7 +49,33 @@ public class ReverseNodesLinkedListTest extends TestCase {
 		System.out.println(" -------- after sorting -------- ");
 		
 		ReverseNodesLinkedList reverseNodesLinkedList = new ReverseNodesLinkedList();
-		trainNode = reverseNodesLinkedList.reverseNodes(headNode);
+		trainNode = reverseNodesLinkedList.reverseNodesWithRecursion(headNode);
+		
+		while (trainNode != null) {
+			System.out.println(trainNode.val);
+			trainNode = trainNode.next;
+		}
+	}
+	
+	public void testCase2() {
+		final ListNode headNode = new ListNode(1);
+		ListNode trainNode = headNode;
+
+		for (int index = 2; index <= 12; index++) {
+			ListNode nextNode = new ListNode(index);
+			trainNode.next = nextNode;
+			trainNode = nextNode;
+		}
+		trainNode = headNode;
+
+		while (trainNode != null) {
+			System.out.println(trainNode.val);
+			trainNode = trainNode.next;
+		}
+		System.out.println(" -------- after sorting -------- ");
+		
+		ReverseNodesLinkedList reverseNodesLinkedList = new ReverseNodesLinkedList();
+		trainNode = reverseNodesLinkedList.reverseNodesWithRecursion(headNode);
 		
 		while (trainNode != null) {
 			System.out.println(trainNode.val);
