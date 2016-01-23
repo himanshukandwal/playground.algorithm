@@ -1,7 +1,10 @@
 package dev.research.himanshu.algorithm;
 
+<<<<<<< HEAD
 import dev.research.himanshu.algorithm.model.ListNode;
 
+=======
+>>>>>>> 1231a9fffb2e7ad01fe5b3a79d9b29c403e61f1c
 public class OddEvenLinkedList {
 
 	public ListNode oddEvenList(ListNode head) {
@@ -35,5 +38,18 @@ public class OddEvenLinkedList {
 		oddTrain.next = evenTrainHead;
 		return oddTrainHead;
 	}
+<<<<<<< HEAD
 	
+=======
+
+}
+
+class ListNode {
+	int val;
+	ListNode next;
+
+	public ListNode(int x) {
+		val = x;
+	}
+>>>>>>> 1231a9fffb2e7ad01fe5b3a79d9b29c403e61f1c
 }
