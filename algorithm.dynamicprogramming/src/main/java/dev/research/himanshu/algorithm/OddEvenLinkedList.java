@@ -35,5 +35,5 @@ public class OddEvenLinkedList {
 		oddTrain.next = evenTrainHead;
 		return oddTrainHead;
 	}
-	
+
 }
