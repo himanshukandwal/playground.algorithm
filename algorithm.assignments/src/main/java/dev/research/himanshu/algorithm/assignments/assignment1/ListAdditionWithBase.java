@@ -10,10 +10,11 @@ public class ListAdditionWithBase {
 	private static long startTime, endTime, elapsedTime;
 
 	public static void add(List<Integer> x, List<Integer> y, List<Integer> z, int b) {
-		operate(x, y, z, b, "add");
+		operate(x, y, z, b, true);
 	}
 	
-	public static void operate(List<Integer> x, List<Integer> y, List<Integer> z, int b, String operation) {
+	public static void operate(List<Integer> x, List<Integer> y, List<Integer> z, int b, boolean isAddition) {
+		
 		Iterator<Integer> xListIterator = x.iterator();
 		Iterator<Integer> yListIterator = y.iterator();
 
@@ -25,7 +26,7 @@ public class ListAdditionWithBase {
 
 		while (!hasReachedxListSentinal || !hasReachedyListSentinal) {
 			if (!hasReachedxListSentinal && !hasReachedyListSentinal) {
-				z.add(computeBaseResult((operation.equals("add") ? (xListElement + yListElement) : (xListElement - yListElement)), b));
+				z.add(computeBaseResult((isAddition ? (xListElement + yListElement) : (xListElement - yListElement)), b));
 
 				hasReachedxListSentinal = ((xListElement = nextIt(xListIterator)) == null ? true : false);
 				hasReachedyListSentinal = ((yListElement = nextIt(yListIterator)) == null ? true : false);
@@ -34,7 +35,8 @@ public class ListAdditionWithBase {
 
 				hasReachedxListSentinal = ((xListElement = nextIt(xListIterator)) == null ? true : false);
 			} else if (hasReachedxListSentinal && !hasReachedyListSentinal) {
-				z.add(computeBaseResult(yListElement, b));
+				// reverse the sign in case of subtraction.
+				z.add(computeBaseResult(yListElement, b) * (isAddition ? 1 : -1));
 
 				hasReachedyListSentinal = ((yListElement = nextIt(yListIterator)) == null ? true : false);
 			}
@@ -42,7 +44,7 @@ public class ListAdditionWithBase {
 	}
 
 	public static void subtract(List<Integer> x, List<Integer> y, List<Integer> z, int b) {
-		operate(x, y, z, b, "subtract");
+		operate(x, y, z, b, false);
 	}
 
 	private static Integer nextIt(Iterator<Integer> iterator) {
