@@ -75,7 +75,7 @@ public class ReverseNodesLinkedListTest extends TestCase {
 		System.out.println(" -------- after sorting -------- ");
 		
 		ReverseNodesLinkedList reverseNodesLinkedList = new ReverseNodesLinkedList();
-		trainNode = reverseNodesLinkedList.reverseNodesWithRecursion(headNode);
+		trainNode = reverseNodesLinkedList.reverseNodesWithoutRecursion(headNode);
 		
 		while (trainNode != null) {
 			System.out.println(trainNode.val);
