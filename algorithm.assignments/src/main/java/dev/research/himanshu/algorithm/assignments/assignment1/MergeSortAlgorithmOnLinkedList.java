@@ -4,8 +4,10 @@ import java.lang.reflect.Array;
 
 public class MergeSortAlgorithmOnLinkedList {
 
+	private static int phase = 0;
+	private static long startTime, endTime, elapsedTime;
+	
 	public static <T extends Comparable<? super T>> void mergeSort(SinglyLinkedList<T> singlyLinkedList) {
-		// first node element
 		SinglyLinkedList<T>.Entry<T> start = singlyLinkedList.header.next;
 
 		if (start == null || start.next == null)
@@ -47,7 +49,7 @@ public class MergeSortAlgorithmOnLinkedList {
 		SinglyLinkedList<T>.Entry<T> rightTraversingEntryPoint = midEntryPoint.next;
 
 		while (leftTraversingEntryPoint != rightTraversingEntryPoint && rightTraversingEntryPoint != sentinalEntryPoint) {
-			// swapping the linking of the elements.
+			// managing the linking of the elements.
 			if (leftTraversingEntryPoint.element.compareTo(rightTraversingEntryPoint.element) >= 0) {
 				leftParentEntryPoint = leftParentEntryPoint.next = rightTraversingEntryPoint;
 				rightParentEntryPoint.next = rightTraversingEntryPoint.next;
@@ -58,6 +60,7 @@ public class MergeSortAlgorithmOnLinkedList {
 				leftTraversingEntryPoint = leftTraversingEntryPoint.next;
 			}
 		}
+		
 		// returning head and tail of the new linkedList
 		resultEntries[0] = parent.next;
 		resultEntries[1] = getPreviousEntry(parent.next, sentinalEntryPoint);
@@ -103,4 +106,43 @@ public class MergeSortAlgorithmOnLinkedList {
 			
 		return traversingEntryPoint;
 	}
+	
+	public static void main(String[] args) {
+		createAndSortLinkedList(1000000);
+		createAndSortLinkedList(5000000);
+		createAndSortLinkedList(10000000);
+	}
+	
+
+	public static void memory() {
+		long memAvailable = Runtime.getRuntime().totalMemory();
+		long memUsed = memAvailable - Runtime.getRuntime().freeMemory();
+		System.out.println("Memory: " + memUsed / 1000000 + " MB / " + memAvailable / 1000000 + " MB.");
+	}
+
+	public static void timer() {
+		if (phase == 0) {
+			startTime = System.currentTimeMillis();
+			phase = 1;
+		} else {
+			endTime = System.currentTimeMillis();
+			elapsedTime = endTime - startTime;
+			System.out.println("Time: " + elapsedTime + " msec.");
+			memory();
+			phase = 0;
+		}
+	}
+	
+	private static void createAndSortLinkedList(int range) {
+		SinglyLinkedList<Integer> singlyLinkedList = new SinglyLinkedList<>();
+		
+		for (int index = range; index > 0; index --) 
+			singlyLinkedList.add(new Integer(index));
+		
+		timer();
+		mergeSort(singlyLinkedList);
+		timer();	
+	}
+	
+	
 }
