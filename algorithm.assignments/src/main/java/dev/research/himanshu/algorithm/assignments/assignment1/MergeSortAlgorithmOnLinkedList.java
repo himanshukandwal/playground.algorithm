@@ -108,6 +108,9 @@ public class MergeSortAlgorithmOnLinkedList {
 	}
 	
 	public static void main(String[] args) {
+		createAndSortLinkedList(1000);
+		createAndSortLinkedList(10000);
+		createAndSortLinkedList(100000);
 		createAndSortLinkedList(1000000);
 		createAndSortLinkedList(5000000);
 		createAndSortLinkedList(10000000);
@@ -139,6 +142,9 @@ public class MergeSortAlgorithmOnLinkedList {
 		for (int index = range; index > 0; index --) 
 			singlyLinkedList.add(new Integer(index));
 		
+		System.out.println("\n ------------------------------------------------------------------------------------------ ");
+		System.out.println("Checking merge-sort performance on the list of elements of size - " + range);
+		System.out.println(" ------------------------------------------------------------------------------------------ ");
 		timer();
 		mergeSort(singlyLinkedList);
 		timer();	
