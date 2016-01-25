@@ -34,22 +34,4 @@ public class RotateLinkedList {
 		return rotatedHeadNode;
 	}
 
-	public static void main(String[] args) {
-		final ListNode headNode = new ListNode(1);
-		ListNode trainNode = headNode;
-
-		for (int index = 2; index <= 2; index++) {
-			ListNode nextNode = new ListNode(index);
-			trainNode.next = nextNode;
-			trainNode = nextNode;
-		}
-
-		trainNode = rotateRight(headNode, 2);
-
-		while (trainNode != null) {
-			System.out.println(trainNode.val);
-			trainNode = trainNode.next;
-		}
-	}
-
 }
