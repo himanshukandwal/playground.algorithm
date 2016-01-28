@@ -71,6 +71,10 @@ public class ReverseNodesInLinkedList {
 		createAndReverseLinkedList(5, false);
 		createAndReverseLinkedList(15, true);
 		createAndReverseLinkedList(15, false);
+		createAndReverseLinkedList(25, true);
+		createAndReverseLinkedList(25, false);
+		createAndReverseLinkedList(50, true);
+		createAndReverseLinkedList(50, false);
 	}
 
 	private static void createAndReverseLinkedList(int range, boolean withRecursion) {
