@@ -97,24 +97,24 @@ public class OddLengthCycle {
 	/**
 	 * A BFS program, which breaks the execution whenever there is a cycle identified amongst the same level nodes.
 	 * 
-	 * @param previousLevelQueue
+	 * @param currentLevelQueue
 	 * @return The edge which is the connecting edge between the same level nodes.
 	 */
-	public static Edge performBFS (Queue<Vertex> previousLevelQueue) {
+	public static Edge performBFS (Queue<Vertex> currentLevelQueue) {
 		Edge oddLengthConnectingEdge = null;
-		Queue<Vertex> currentLevelQueue = new LinkedList<Vertex>();
+		Queue<Vertex> nextLevelQueue = new LinkedList<Vertex>();
 
-		List<Vertex> previousLevelProcessedList = new ArrayList<Vertex>();
+		List<Vertex> currentLevelProcessedList = new ArrayList<Vertex>();
 		
-		while (previousLevelQueue.size() != 0) {
-			Vertex levelVertex = previousLevelQueue.poll();
-			previousLevelProcessedList.add (levelVertex);
+		while (currentLevelQueue.size() != 0) {
+			Vertex levelVertex = currentLevelQueue.poll();
+			currentLevelProcessedList.add (levelVertex);
 
 			for (Edge edge : levelVertex.Adj) {
 				Vertex adjacentVertex = edge.otherEnd (levelVertex);
 				
-				if (! (previousLevelProcessedList.contains(adjacentVertex) || previousLevelQueue.contains(adjacentVertex))) {
-					currentLevelQueue.add (edge.otherEnd(levelVertex));
+				if (! (currentLevelProcessedList.contains(adjacentVertex) || currentLevelQueue.contains(adjacentVertex))) {
+					nextLevelQueue.add (edge.otherEnd(levelVertex));
 				} else {
 					oddLengthConnectingEdge = edge;
 					break;
@@ -127,8 +127,8 @@ public class OddLengthCycle {
 				break;
 		}
 
-		if (currentLevelQueue.size() > 0 && oddLengthConnectingEdge == null)
-			oddLengthConnectingEdge = performBFS (currentLevelQueue);
+		if (nextLevelQueue.size() > 0 && oddLengthConnectingEdge == null)
+			oddLengthConnectingEdge = performBFS (nextLevelQueue);
 		
 		return oddLengthConnectingEdge;
 	}
