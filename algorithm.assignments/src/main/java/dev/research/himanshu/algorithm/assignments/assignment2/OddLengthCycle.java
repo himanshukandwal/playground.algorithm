@@ -86,11 +86,13 @@ public class OddLengthCycle {
 		
 		cycle.add(fromVertex);
 		
-		if (fromVertex.parent == toVertex.parent)
+		if (fromVertex.parent == toVertex.parent) {
+			System.out.println("Detected least common ancestor : " + fromVertex.parent);
+			
 			cycle.add (fromVertex.parent);
-		else
+		} else {
 			findCycle(cycle, fromVertex.parent, toVertex.parent);
-		
+		}
 		cycle.add(toVertex);
 	}
 	 
