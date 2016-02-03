@@ -83,10 +83,6 @@ public class DAGTopologicalOrdering {
 				performDFS(topologicalOrderStack, graphVertex);
 		}
 
-		for (Vertex vertex : topologicalOrderStack) {
-			System.out.println(vertex);
-		}
-
 		if (topologicalOrderStack.size() != graph.verts.size() - 1)
 			return null;
 		else
@@ -199,7 +195,7 @@ public class DAGTopologicalOrdering {
 				if (topologicalOrder == null) {
 					System.out.println("Not a DAG, no topological order found !");
 				} else {
-					System.out.println("Topological Order found for DAG : ");
+					System.out.println("Topological Order found for DAG (using Stack) : ");
 					System.out.println(
 							"----------------------------------------------------------------------------------");
 

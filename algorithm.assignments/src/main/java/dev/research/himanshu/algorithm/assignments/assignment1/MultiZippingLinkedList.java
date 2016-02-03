@@ -48,7 +48,7 @@ public class MultiZippingLinkedList {
 			singlyLinkedList.add(new Integer(index));
 		
 		singlyLinkedList.printList();
-		multiUnzip(singlyLinkedList.header.next, 4);
+		multiUnzip(singlyLinkedList.header.next, 3);
 		singlyLinkedList.printList();
 	}
 

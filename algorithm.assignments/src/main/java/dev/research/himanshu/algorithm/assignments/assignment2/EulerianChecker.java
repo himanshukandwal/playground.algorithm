@@ -56,11 +56,11 @@ public class EulerianChecker {
 			
 			/* case 2 : check for eularian path condition*/
 			if (oddDegreeVertices.size() == 2) {
-				System.out.println("Graph has an Eulerian Path between vertices " + oddDegreeVertices.get(0) + " and " + oddDegreeVertices.get(1));
+				System.out.println("Graph has an Eulerian Path between vertices " + oddDegreeVertices.get(0) + " and " + oddDegreeVertices.get(1) + ".");
 				return;
 			}
 			
-			System.out.println("Graph is Eulerian");
+			System.out.println("Graph is Eulerian.");
 		}
 		
 	}
