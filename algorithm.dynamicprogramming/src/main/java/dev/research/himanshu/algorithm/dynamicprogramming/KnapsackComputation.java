@@ -42,10 +42,11 @@ public class KnapsackComputation {
 			if (remainder == 0) {
 				return value;
 			} else {
-				
+				// without me	(only future)															 
+				max = Math.max (recurseEvaluationWithoutDuplicates (data, totalWeight, index + 1), 
+									// with me (my this computation + future
+									value + recurseEvaluationWithoutDuplicates (data, remainder, index + 1));
 			}
-								// without me	(only future)															// with me (my this computation + future 
-			max = Math.max (recurseEvaluationWithoutDuplicates (data, totalWeight, index + 1), value + recurseEvaluationWithoutDuplicates (data, remainder, index + 1));
 		}
 		
 		return max;
