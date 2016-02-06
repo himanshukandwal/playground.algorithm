@@ -23,4 +23,8 @@ public class CoinChangeTest extends TestCase {
 	public void testcase5() throws Exception {
 		assertEquals(26, CoinChange.coinChange(new int[] {336, 288, 378, 16, 319, 146},  9212));
 	}
+	
+	public void testcase6() throws Exception {
+		assertEquals(21, CoinChange.coinChange(new int[] {58, 92, 387, 421, 194, 208, 231},  7798));
+	}
 }
