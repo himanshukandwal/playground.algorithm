@@ -1,4 +1,4 @@
-package dev.research.himanshu.algorithm;
+package dev.research.himanshu.algorithm.dynamicprogramming;
 
 import junit.framework.TestCase;
 
