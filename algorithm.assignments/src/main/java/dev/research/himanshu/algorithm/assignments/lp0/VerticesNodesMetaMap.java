@@ -7,6 +7,14 @@ import dev.research.himanshu.algorithm.assignments.lp0.EularEdgeLinkedList.Node;
  * access to the nodes<edge> object, in order to patch the different linkedlist into one,
  * in O(1) time. 
  * 
+ * This is a quick map, based on the vertex.name rather than random ordering. 
+ * The class with have size of g.verts.size() and Node<Edge> object corresponding to any
+ * vertex can be accessed directly via the vertex.name position.
+ * 
+ * Example : 
+ * 			verticesEdgeArray[vertex.name][0] -> vertex reference
+ * 			verticesEdgeArray[vertex.name][1] -> EularEdgeLinkedList Node reference
+ * 
  * @author G31
  *
  */

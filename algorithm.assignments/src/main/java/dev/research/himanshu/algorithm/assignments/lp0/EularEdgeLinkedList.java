@@ -19,9 +19,9 @@ import java.util.function.Consumer;
  * A hacked class bearing the near same implementation of linked list, with changes as per to the need for LP0
  * 
  * Changes :
- * 	a) Object[][] verticesEdgeArray;
- * 			This contains the linking of nodes along with the LinkedListNode for the vertices for O(1) traversal
- * 	
+ * 	a) VerticesNodesMetaMap verticesNodesMetaMap :
+ * 			This is a quick map, based on the that stores only one (first) Node<Edge> entry for all the participating vertices.
+ * 			The storing is done by the vertex.name position rather than random insertion ordering.
  * 
  * @author G31
  *
