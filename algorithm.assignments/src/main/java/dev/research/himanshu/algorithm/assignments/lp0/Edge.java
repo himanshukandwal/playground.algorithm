@@ -3,6 +3,8 @@ package dev.research.himanshu.algorithm.assignments.lp0;
 /**
  * Class that represents an arc in a Graph
  *
+ * @author rbk
+ * 
  */
 public class Edge {
 	public Vertex From; // head vertex

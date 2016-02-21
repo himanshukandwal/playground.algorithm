@@ -65,16 +65,27 @@ public class HierholzerAlgorithmImpl {
 		return eularEdges;
 	}
 
+	/*
+	 * Main Recursive Algorithm performing the activity of implementing Hierholzer Algorithm, post all the condition have been met.
+	 */
 	private static EularEdgeLinkedList<Edge> FindEulerTourInternal(Graph g, VerticesNodesMetaMap verticesNodesMetaMap, Vertex startNode, Vertex endNode, int intialSize) {
 		
 		EularEdgeLinkedList<Edge> eularEdges = new EularEdgeLinkedList<>(verticesNodesMetaMap);
 		Vertex futureVertex = startNode;
 		boolean foundway = true;
-
+		
+		/*
+		 * This loop, iteratively builds the Eular path (EularEdgeLinkedList<Edge>), by using the connecting adjacent edges.
+		 */
 		while (foundway) {
 			foundway = false;
 			for (Iterator<Edge> futureVertexIterator = futureVertex.Adj.iterator(); futureVertexIterator.hasNext();) {
 				Edge edge = futureVertexIterator.next();
+				
+				/* 
+				 * If an edge has already been used by the other pairing node, then mark it as processed and remove in order to prevent
+				 * future checking.
+				 */
 				if (edge.isUsed) {
 					futureVertex.processedEdges.add(edge);
 					futureVertexIterator.remove();
@@ -112,6 +123,11 @@ public class HierholzerAlgorithmImpl {
 			while (branchedStartNode == null) {
 				for (Iterator<Edge> traversingOtherVertexIterator = traversingOtherVertex.Adj.iterator(); traversingOtherVertexIterator.hasNext();) {
 					Edge edge = traversingOtherVertexIterator.next();
+					
+					/* 
+					 * If an edge has already been used by the other pairing node, then mark it as processed and remove in order to prevent
+					 * future checking.
+					 */
 					if (edge.isUsed) {
 						futureVertex.processedEdges.add(edge);
 						traversingOtherVertexIterator.remove();
@@ -129,7 +145,13 @@ public class HierholzerAlgorithmImpl {
 			
 			Node<Edge> edgeNode = verticesNodesMetaMap.getEdgeNodeByVertex(branchedStartNode);
 			
-			/* patching with the global Structure, Expansion of nodes */
+			/* 
+			 * Patching with the global Structure using the verticesNodesMetaMap, Expansion of nodes.
+			 * 
+			 *  We find the immediate Node<Edge> next to the branchedStartNode vertex from the map, and add
+			 *  the complete chain surrounding that. 
+			 * 
+			 */
 			int leftoverEdgesSize = leftoverEdges.size();
 			
 			if (edgeNode.next == null) {
@@ -149,20 +171,14 @@ public class HierholzerAlgorithmImpl {
 		return eularEdges;
 	}
 
-	public static boolean checkEularPrecondition(Graph g) {
-		int oddEdgeNodesCount = 0;
-
-		for (Vertex vertex : g.verts) {
-			if (vertex.Adj.size() % 2 != 0)
-				oddEdgeNodesCount++;
-		}
-
-		if (oddEdgeNodesCount != 2)
-			return false;
-		else
-			return true;
-	}
-
+	/**
+	 * Method to verify whether a tour is Eular or not. 
+	 * 
+	 * @param g
+	 * @param tour
+	 * @param start
+	 * @return
+	 */
 	public static boolean verifyTour(Graph g, List<Edge> tour, Vertex start) {
 
 		/* check : tour must contain all the edges */
@@ -175,6 +191,7 @@ public class HierholzerAlgorithmImpl {
 			return false;
 		}
 		
+		/* check : tour must have all the edges adjacent to each other */
 		Vertex traversingVertex = start;
 		for (Edge edge : tour) {
 			if (edge.From == traversingVertex || edge.To == traversingVertex) {

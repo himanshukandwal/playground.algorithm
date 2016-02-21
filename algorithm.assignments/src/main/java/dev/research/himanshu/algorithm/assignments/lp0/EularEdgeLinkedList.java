@@ -23,7 +23,9 @@ import java.util.function.Consumer;
  * 			This is a quick map, based on the that stores only one (first) Node<Edge> entry for all the participating vertices.
  * 			The storing is done by the vertex.name position rather than random insertion ordering.
  * 
- * @author G31
+ * @author Josh Bloch
+ * 
+ * @Modified by : G31
  *
  */
 		

@@ -3,7 +3,9 @@ package dev.research.himanshu.algorithm.assignments.lp0;
 /**
  * Class to represent a vertex of a graph
  * 
- *
+ * @author rbk
+ * 
+ * @Modified by : G31
  */
 import java.util.ArrayList;
 import java.util.List;

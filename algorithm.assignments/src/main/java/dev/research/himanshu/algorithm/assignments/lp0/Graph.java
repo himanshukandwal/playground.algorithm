@@ -5,6 +5,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Graph Data Structure
+ * 
+ * @author rbk
+ * 
+ **/
 class Graph implements Iterable<Vertex> {
 	public List<Vertex> verts; // array of vertices
 	public int numNodes; // number of verices in the graph
