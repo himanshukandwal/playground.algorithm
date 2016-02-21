@@ -1,4 +1,4 @@
-package dev.research.himanshu.algorithm.assignments.lp0;
+package dev.research.himanshu.algorithm.assignments.longproject0;
 
 import java.util.ArrayList;
 import java.util.Iterator;

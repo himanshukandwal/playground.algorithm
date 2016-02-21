@@ -1,4 +1,4 @@
-package dev.research.himanshu.algorithm.assignments.lp0;
+package dev.research.himanshu.algorithm.assignments.longproject0;
 
 /**
  * Class to represent a vertex of a graph
@@ -16,7 +16,7 @@ public class Vertex {
 	public List<Edge> Adj, revAdj; // adjacency list; use LinkedList or
 									// ArrayList
 	public List<Edge> processedEdges;
-	
+
 	/**
 	 * Constructor for the vertex
 	 * 
@@ -29,6 +29,7 @@ public class Vertex {
 		parent = null;
 		Adj = new ArrayList<Edge>();
 		revAdj = new ArrayList<Edge>(); /* only for directed graphs */
+		processedEdges = new ArrayList<Edge>();
 	}
 	
 	/**

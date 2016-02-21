@@ -1,4 +1,4 @@
-package dev.research.himanshu.algorithm.assignments.lp0;
+package dev.research.himanshu.algorithm.assignments.longproject0;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-import dev.research.himanshu.algorithm.assignments.lp0.EularEdgeLinkedList.Node;
+import dev.research.himanshu.algorithm.assignments.longproject0.EularEdgeLinkedList.Node;
 
 /**
  * A graph G is called Eulerian if it is connected and the degree of every vertex is an even number. 
