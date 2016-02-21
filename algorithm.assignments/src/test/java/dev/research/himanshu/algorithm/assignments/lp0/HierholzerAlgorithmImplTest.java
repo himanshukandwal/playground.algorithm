@@ -8,7 +8,11 @@ import junit.framework.TestCase;
 
 public class HierholzerAlgorithmImplTest extends TestCase {
 
+<<<<<<< HEAD
 	public void testCheckSampleInput1() throws Exception {
+=======
+	public void testCheckSampleInput() throws Exception {
+>>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 		Graph g = prepareGraph(System.getProperty("user.dir") + "/src/main/resources/lp0-HierholzerAlgorithm-1.txt");
 		
 		assertTrue(
@@ -18,7 +22,10 @@ public class HierholzerAlgorithmImplTest extends TestCase {
 						g.verts.get(1)
 				)
 		);
+<<<<<<< HEAD
 		System.out.println();
+=======
+>>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 
 	public void testCheckSampleInput2() throws Exception {
@@ -31,7 +38,10 @@ public class HierholzerAlgorithmImplTest extends TestCase {
 						g.verts.get(1)
 				)
 		);
+<<<<<<< HEAD
 		System.out.println();
+=======
+>>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 	
 	public void testCheckSampleInput3() throws Exception {
@@ -44,7 +54,10 @@ public class HierholzerAlgorithmImplTest extends TestCase {
 						g.verts.get(4)
 				)
 		);
+<<<<<<< HEAD
 		System.out.println();
+=======
+>>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 	
 	public void testCheckSampleInput4() throws Exception {
@@ -54,7 +67,11 @@ public class HierholzerAlgorithmImplTest extends TestCase {
 				HierholzerAlgorithmImpl.verifyTour (
 						g, 
 						HierholzerAlgorithmImpl.findEulerTour (g), 
+<<<<<<< HEAD
 						g.verts.get(1)
+=======
+						g.verts.get(4)
+>>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 				)
 		);
 	}
