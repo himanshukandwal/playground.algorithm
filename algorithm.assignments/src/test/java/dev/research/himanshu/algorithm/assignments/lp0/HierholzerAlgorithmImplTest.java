@@ -1,4 +1,4 @@
-package dev.research.himanshu.algorithm.assignments.longproject0;
+package dev.research.himanshu.algorithm.assignments.lp0;
 
 import java.io.File;
 import java.io.FileNotFoundException;
