@@ -2,7 +2,14 @@ package dev.research.himanshu.algorithm.assignments.lp0;
 
 import dev.research.himanshu.algorithm.assignments.lp0.EularEdgeLinkedList.Node;
 
-
+/**
+ * This class acts as a map between the vertex and the linkedlist nodes, for the quick 
+ * access to the nodes<edge> object, in order to patch the different linkedlist into one,
+ * in O(1) time. 
+ * 
+ * @author G31
+ *
+ */
 public class VerticesNodesMetaMap {
 	
 	public int size;
