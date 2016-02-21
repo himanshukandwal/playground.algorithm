@@ -15,11 +15,8 @@ public class Vertex {
 	public int distance; // distance to the vertex from the source vertex
 	public List<Edge> Adj, revAdj; // adjacency list; use LinkedList or
 									// ArrayList
-<<<<<<< HEAD
 	public List<Edge> processedEdges;
 	
-=======
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	/**
 	 * Constructor for the vertex
 	 * 
@@ -32,10 +29,6 @@ public class Vertex {
 		parent = null;
 		Adj = new ArrayList<Edge>();
 		revAdj = new ArrayList<Edge>(); /* only for directed graphs */
-<<<<<<< HEAD
-		processedEdges = new ArrayList<Edge>();
-=======
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 	
 	/**

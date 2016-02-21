@@ -9,12 +9,8 @@ class Graph implements Iterable<Vertex> {
 	public List<Vertex> verts; // array of vertices
 	public int numNodes; // number of verices in the graph
 	public int numEdges; // number of edges in the graph
-<<<<<<< HEAD
 	public List<Edge> edges; // array of vertices
 	
-=======
-
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	/**
 	 * Constructor for Graph
 	 * 
@@ -32,12 +28,8 @@ class Graph implements Iterable<Vertex> {
 	
 	public Graph(int size, int edges) {
 		this(size);
-<<<<<<< HEAD
 		this.numEdges = edges;
 		this.edges = new ArrayList<>(numEdges);
-=======
-		numEdges = edges;
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 
 	/**
@@ -56,10 +48,7 @@ class Graph implements Iterable<Vertex> {
 		Edge e = new Edge(u, v, weight);
 		u.Adj.add(e);
 		v.Adj.add(e);
-<<<<<<< HEAD
 		edges.add(e);
-=======
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 
 	/**
@@ -78,10 +67,7 @@ class Graph implements Iterable<Vertex> {
 		Edge e = new Edge(head, tail, weight);
 		head.Adj.add(e);
 		tail.revAdj.add(e);
-<<<<<<< HEAD
 		edges.add(e);
-=======
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	}
 
 	/**

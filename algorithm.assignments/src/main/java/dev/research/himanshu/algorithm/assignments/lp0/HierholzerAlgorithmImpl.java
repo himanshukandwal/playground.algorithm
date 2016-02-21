@@ -2,15 +2,10 @@ package dev.research.himanshu.algorithm.assignments.lp0;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-<<<<<<< HEAD
-=======
-import java.util.ArrayList;
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
 
-<<<<<<< HEAD
 import dev.research.himanshu.algorithm.assignments.lp0.EularEdgeLinkedList.Node;
 
 /**
@@ -29,8 +24,6 @@ import dev.research.himanshu.algorithm.assignments.lp0.EularEdgeLinkedList.Node;
  * @author G31
  *
  */
-=======
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 public class HierholzerAlgorithmImpl {
 
 	private static int phase = 0;
@@ -39,7 +32,6 @@ public class HierholzerAlgorithmImpl {
 	public static List<Edge> findEulerTour(Graph g) {
 		
 		/* checking Eular preconditions */
-<<<<<<< HEAD
 		int oddEdgeNodesCount = 0;
 		Vertex eularPathStartNode = null;
 		Vertex eularPathEndNode = null;
@@ -54,29 +46,6 @@ public class HierholzerAlgorithmImpl {
 				
 				if (oddEdgeNodesCount > 2) {
 					break;
-=======
-		
-		int oddEdgeNodesCount = 0;
-		Vertex eularPathStartNode = null;
-		Vertex eularPathEndNode = null;
-		List<Edge> totalEdges = new ArrayList<>();
-		
-		for (Vertex vertex : g.verts) {
-			if (vertex != null) {
-				if (vertex.Adj.size() % 2 != 0) {
-					if (eularPathStartNode == null)
-						eularPathStartNode = vertex;
-					else
-						eularPathEndNode = vertex;
-					oddEdgeNodesCount ++;
-				}
-				
-				for (Edge edge : vertex.Adj) {
-					if (!edge.isUsed) {
-						totalEdges.add(edge);
-						edge.isUsed = true;
-					}
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 				}
 			}
 		}
@@ -86,51 +55,24 @@ public class HierholzerAlgorithmImpl {
 			return null;
 		}
 		
-<<<<<<< HEAD
 		/* if the graph has no eular path then, considering eular tour and setting start node as : node 1 */
 		eularPathStartNode = (eularPathStartNode == null ? g.verts.get(1) : eularPathStartNode);
 		
 		VerticesNodesMetaMap verticesNodesMetaMap = new VerticesNodesMetaMap(g.verts.size());
 		
 		EularEdgeLinkedList<Edge> eularEdges = FindEulerTourInternal (g, verticesNodesMetaMap, eularPathStartNode, eularPathEndNode, 0);
-=======
-		resetGraph(g);
-		
-		/* if the graph has no eular path then, considering eular tour and setting start node as : node 1 */
-		eularPathStartNode = (eularPathStartNode == null ? g.verts.get(1) : eularPathStartNode);
-		
-		List<Edge> eularEdges = FindEulerTourInternal (g, totalEdges, eularPathStartNode, eularPathEndNode);
-		
-		/* print the eular tour/circuit */
-		Vertex traversingVertex = eularPathStartNode;
-		for (Iterator<Edge> eularEdgesIterator = eularEdges.iterator(); eularEdgesIterator.hasNext();) {
-			Edge eularEdge = eularEdgesIterator.next();
-			
-			System.out.print(traversingVertex.name);
-			traversingVertex = (eularEdge.From == traversingVertex ? eularEdge.To : eularEdge.From);
-			System.out.print(" -> ");	
-		}
-		System.out.print((eularPathEndNode != null ? eularPathEndNode.name : eularPathStartNode.name));
-		System.out.println();
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 		
 		return eularEdges;
 	}
 
-<<<<<<< HEAD
 	private static EularEdgeLinkedList<Edge> FindEulerTourInternal(Graph g, VerticesNodesMetaMap verticesNodesMetaMap, Vertex startNode, Vertex endNode, int intialSize) {
 		
 		EularEdgeLinkedList<Edge> eularEdges = new EularEdgeLinkedList<>(verticesNodesMetaMap);
-=======
-	private static List<Edge> FindEulerTourInternal(Graph g, List<Edge> totalEdges, Vertex startNode, Vertex endNode) {
-		List<Edge> eularEdges = new ArrayList<>();
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 		Vertex futureVertex = startNode;
 		boolean foundway = true;
 
 		while (foundway) {
 			foundway = false;
-<<<<<<< HEAD
 			for (Iterator<Edge> futureVertexIterator = futureVertex.Adj.iterator(); futureVertexIterator.hasNext();) {
 				Edge edge = futureVertexIterator.next();
 				if (edge.isUsed) {
@@ -148,17 +90,6 @@ public class HierholzerAlgorithmImpl {
 				eularEdges.addLast(edge);
 				foundway = true;
 				break;
-=======
-			for (Edge edge : futureVertex.Adj) {
-				if (!edge.isUsed) {
-					edge.isUsed = true;
-					futureVertex.seen = true;
-					futureVertex = edge.otherEnd(futureVertex);
-					eularEdges.add(edge);
-					foundway = true;
-					break;
-				}
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 			}
 		}
 
@@ -169,7 +100,6 @@ public class HierholzerAlgorithmImpl {
 		 * 
 		 * Then patch all the results together.
 		 */
-<<<<<<< HEAD
 		
 		/* choosing the start point from the present circuit, for the leftover circuit discovery ! */
 		
@@ -219,46 +149,6 @@ public class HierholzerAlgorithmImpl {
 		return eularEdges;
 	}
 
-=======
-		if (eularEdges.size() != totalEdges.size()) {
-			for (Edge edge : totalEdges) {
-				if (!edge.isUsed) {
-					Vertex branchedStartNode = (edge.From.seen ? edge.From : edge.To);
-					List<Edge> leftoverEdges = FindEulerTourInternal(g, totalEdges, branchedStartNode, endNode);
-					
-					int eularEdgeIndex = 0;
-					
-					/* choosing the start point from the present circuit, for the leftover circuit discovery ! */ 
-					for (eularEdgeIndex = 0; eularEdgeIndex < eularEdges.size(); eularEdgeIndex ++) {
-						if (eularEdges.get(eularEdgeIndex).From == branchedStartNode || eularEdges.get(eularEdgeIndex).To == branchedStartNode) {
-							break;
-						}
-					}
-					eularEdgeIndex ++;
-					
-					/* patching with the global Structure, Expansion of nodes */
-					for (Edge leftoverEdge : leftoverEdges)
-						eularEdges.add(eularEdgeIndex, leftoverEdge);
-					
-					break;
-				}
-			}
-		}
-		return eularEdges;
-	}
-
-	// resetting the state of the edges to original state : isUsed = false;
-	private static void resetGraph(Graph g) {
-		for (Vertex vertex : g.verts) {
-			if (vertex != null) {
-				for (Edge edge : vertex.Adj)
-					edge.isUsed = false;
-				vertex.seen = false;
-			}
-		}
-	}
-
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 	public static boolean checkEularPrecondition(Graph g) {
 		int oddEdgeNodesCount = 0;
 
@@ -328,23 +218,18 @@ public class HierholzerAlgorithmImpl {
 
 			// read undirected graph from stream "in"
 			Graph g = Graph.readGraph(in, false);
-<<<<<<< HEAD
 
 			timer();
 			List<Edge> eularEdges = findEulerTour (g);
 			timer();
 			
 			// print the eular tour/circuit
-			for (Edge eularEdge : eularEdges)
+			for (Edge eularEdge : eularEdges) {
 				System.out.println(eularEdge);
+			}
 			
 			timer();
 			verifyTour(g, eularEdges, g.verts.get(1));
-=======
-			
-			timer();
-			findEulerTour (g);
->>>>>>> bd478faf2ec6754d33e0844d01f01a2227d88b9c
 			timer();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
