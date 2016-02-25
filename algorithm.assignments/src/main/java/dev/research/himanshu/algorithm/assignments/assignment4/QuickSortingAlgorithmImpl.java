@@ -213,10 +213,10 @@ public class QuickSortingAlgorithmImpl {
 		testsForInt(16777216, false);
 		
 		testsForInt(67108864, false);
-		
+
 		testsForInt(50000000, true);
 		testsForInt(50000000, false);
-		
+
 		System.out.println("----------------------------------------------------");
 
 	}
