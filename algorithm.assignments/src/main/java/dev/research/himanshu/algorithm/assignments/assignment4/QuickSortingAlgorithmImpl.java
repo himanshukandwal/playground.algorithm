@@ -1,5 +1,10 @@
 package dev.research.himanshu.algorithm.assignments.assignment4;
 
+<<<<<<< HEAD
+=======
+import java.util.Arrays;
+import java.util.Collections;
+>>>>>>> d92b3a96edab6f039ab1f9d534b223254f26b0b0
 import java.util.Comparator;
 import java.util.Random;
 
@@ -197,6 +202,7 @@ public class QuickSortingAlgorithmImpl {
 	public static void main(String[] args) {
 		System.out.println("----------------------------------------------------");
 		
+<<<<<<< HEAD
 		testsForInt(1000000, true);
 		testsForInt(1000000, false);
 		
@@ -205,6 +211,20 @@ public class QuickSortingAlgorithmImpl {
 		
 		testsForInt(10000000, true);
 		testsForInt(10000000, false);
+=======
+//		testsForInt(1000000, true);
+//		testsForInt(1000000, false);
+//		
+//		testsForInt(5000000, true);
+//		testsForInt(5000000, false);
+//		
+//		testsForInt(10000000, true);
+//		testsForInt(10000000, false);
+//		
+//		testsForInt(50000000, true);
+//		testsForInt(50000000, false);
+		
+>>>>>>> d92b3a96edab6f039ab1f9d534b223254f26b0b0
 		
 		testsForInt(1048576, false);
 		
@@ -214,9 +234,12 @@ public class QuickSortingAlgorithmImpl {
 		
 		testsForInt(67108864, false);
 		
+<<<<<<< HEAD
 		testsForInt(50000000, true);
 		testsForInt(50000000, false);
 		
+=======
+>>>>>>> d92b3a96edab6f039ab1f9d534b223254f26b0b0
 		System.out.println("----------------------------------------------------");
 
 	}
