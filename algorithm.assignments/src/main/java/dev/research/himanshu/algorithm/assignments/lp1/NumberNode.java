@@ -11,6 +11,10 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 
 	// Required base in which operations to be performed.
 	protected static final Integer BASE = 10;
+	
+	protected static final NumberNode ONE = new NumberNode(1);
+	
+	protected static final NumberNode TWO = new NumberNode(2);
 
 	/**
 	 * Default Constructor
