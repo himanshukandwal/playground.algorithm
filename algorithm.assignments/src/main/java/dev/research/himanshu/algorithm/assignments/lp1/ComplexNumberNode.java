@@ -1,8 +1,11 @@
 package dev.research.himanshu.algorithm.assignments.lp1;
 
+<<<<<<< HEAD
 import java.util.Iterator;
 import java.util.List;
 
+=======
+>>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 /**
  * Class implementing level 2 features.
  * 
@@ -10,6 +13,7 @@ import java.util.List;
  *
  */
 public class ComplexNumberNode extends NumberNode {
+<<<<<<< HEAD
 	
 	/**
 	 * Default Constructor
@@ -214,4 +218,7 @@ public class ComplexNumberNode extends NumberNode {
 		return c;
 	}
 	
+=======
+
+>>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 }
