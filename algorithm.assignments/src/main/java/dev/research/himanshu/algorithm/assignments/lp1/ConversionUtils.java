@@ -87,4 +87,21 @@ public class ConversionUtils {
 		return (resultingNumber == input ? true : false);
 	}
 	
+	public static boolean verifyBaseRepresentation(List<Long> list, String input, int base) {
+		StringBuffer buffer = new StringBuffer();
+		
+		boolean foundNegative = false;
+		for (Long longVal : list) {
+			if (longVal < 0) {
+				foundNegative = true;
+				longVal *= -1;
+			}
+			buffer.append(longVal);
+		}
+		String representation = buffer.reverse().toString();
+		representation =  (foundNegative ? "-" + representation : representation);
+
+		return representation.equals(input);
+	}
+	
 }
