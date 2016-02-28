@@ -43,7 +43,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * 
 	 * @param stringVal
 	 */
-	public NumberNode(List<Integer> value) {
+	public NumberNode(List<Long> value) {
 		setValue(value);
 	}
 	
@@ -51,7 +51,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * overridden abstract method
 	 */
 	@Override
-	public int getBaseValue() {
+	protected int getBaseValue() {
 		return BASE;
 	}
 	
@@ -98,17 +98,17 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 */
 	@Override
 	public int compareTo(NumberNode o) {
-		Integer returnVal = 0;
+		Long returnVal = 0l;
 		
 		if (getValue().size() > o.getValue().size()) {
-			returnVal =  1;
+			returnVal =  1l;
 		} else if (getValue().size() < o.getValue().size()) {
-			returnVal = -1;	
+			returnVal = -1l;	
 		} else {
 			returnVal = compareValues(o.getValue());
 		}
 		
-		return returnVal; 
+		return returnVal.intValue(); 
 	}
 	
 	/**
@@ -118,7 +118,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		StringBuffer sb = new StringBuffer();
 		sb.append(BASE + " : ");
 
-		for (Integer element : getValue())
+		for (Long element : getValue())
 			sb.append(element).append(" ");
 			
 		System.out.println(sb.toString());
@@ -134,11 +134,36 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		if (!isNegative()) {
 			return this;
 		} else {
-			List<Integer> copyList = new LinkedList<>(getValue());
+			List<Long> copyList = new LinkedList<>(getValue());
 			NumberNode node = new NumberNode(copyList);
 			return node.negate();
 		}
 	}
+	
+	/**
+	 * helper function that left shifts once the number node.
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public NumberNode shift(int n) {
+		for (int counter = 0; counter < n; counter++) {
+			shift();
+		}
+		return this;
+	}
+	
+	/**
+	 * helper function that left shifts once the number node.
+	 * 
+	 * @param list
+	 * @return
+	 */
+	public NumberNode shift() {
+		getValue().add(0, 0l);
+		return this;
+	}
+	
 	
 	/**
 	 * function that performs the sum of two positive NumberNode(s).
@@ -150,23 +175,23 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @return NumberNode
 	 */
 	public static NumberNode sum(NumberNode a, NumberNode b) {
-		List<Integer> x = a.getValue();
-		List<Integer> y = b.getValue();
+		List<Long> x = a.getValue();
+		List<Long> y = b.getValue();
 
 		NumberNode c = new NumberNode();
-		List<Integer> z = c.getValue();
+		List<Long> z = c.getValue();
 		
-		int carry = 0;
+		long carry = 0;
 		
-		Iterator<Integer> xIterator = x.iterator();
-		Iterator<Integer> yIterator = y.iterator();
+		Iterator<Long> xIterator = x.iterator();
+		Iterator<Long> yIterator = y.iterator();
 		
 		while (xIterator.hasNext() || yIterator.hasNext()) {
 			
-			int addedSum = getNext(xIterator) + getNext(yIterator) + carry;
+			long addedSum = getNext(xIterator) + getNext(yIterator) + carry;
 			
 			if (addedSum > 0) {
-				List<Integer> innerIntermediateSumList = ConversionUtils.convertToBase(addedSum, BASE);
+				List<Long> innerIntermediateSumList = ConversionUtils.convertToBase(addedSum, BASE);
 				if (innerIntermediateSumList.size() > 1) {
 					carry = innerIntermediateSumList.get(1);
 					addedSum = innerIntermediateSumList.get(0);
@@ -204,31 +229,31 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		
 		boolean negative  = (a.compareTo(b) < 0);
 		
-		List<Integer> x = (negative ? b.getValue() : a.getValue());
-		List<Integer> y = (negative ? a.getValue() : b.getValue());
+		List<Long> x = (negative ? b.getValue() : a.getValue());
+		List<Long> y = (negative ? a.getValue() : b.getValue());
 		
 		NumberNode c = new NumberNode();
-		List<Integer> z = c.getValue();
+		List<Long> z = c.getValue();
 		
 		int borrow = 0;
 		
-		Iterator<Integer> xIterator = x.iterator();
-		Iterator<Integer> yIterator = y.iterator();
+		Iterator<Long> xIterator = x.iterator();
+		Iterator<Long> yIterator = y.iterator();
 		
 		while (xIterator.hasNext()) {
-			Integer firstValue = getNext(xIterator);
+			Long firstValue = getNext(xIterator);
 			if (borrow > 0) {
 				firstValue = firstValue - borrow;
 				borrow = 0;
 			}
 
-			Integer secondValue = getNext(yIterator);
+			Long secondValue = getNext(yIterator);
 			if (secondValue > firstValue) {
 				borrow ++;
 				firstValue = firstValue + BASE;
 			}
 			
-			Integer intermediateResult = firstValue - secondValue;
+			Long intermediateResult = firstValue - secondValue;
 			
 			if (intermediateResult > 0)
 				intermediateResult = ConversionUtils.convertToBase(intermediateResult, BASE).get(0);
@@ -251,37 +276,37 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 */
 	public static NumberNode product(NumberNode a, NumberNode b) {
 		
-		List<Integer> x = a.getValue();
-		List<Integer> y = b.getValue();
+		List<Long> x = a.getValue();
+		List<Long> y = b.getValue();
 
 		NumberNode c = new NumberNode(0);
 		
-		Iterator<Integer> xIterator = x.iterator();
+		Iterator<Long> xIterator = x.iterator();
 		
-		int globalCarry = 0;
-		int rowOffset = 0;
+		long globalCarry = 0;
+		long rowOffset = 0;
 		
 		while (xIterator.hasNext()) {
-			int carry = globalCarry;
+			long carry = globalCarry;
 			
 			NumberNode productRowRepresentation = new NumberNode();
 
-			Integer xvalue = xIterator.next();
-			Iterator<Integer> yIterator = y.iterator();
+			Long xvalue = xIterator.next();
+			Iterator<Long> yIterator = y.iterator();
 			
-			int currentRowOffset = rowOffset;
+			long currentRowOffset = rowOffset;
 			
 			// add the row offset
 			while (currentRowOffset != 0) {
-				productRowRepresentation.getValue().add(0);
+				productRowRepresentation.getValue().add(0l);
 				currentRowOffset --;
 			}
 			
 			while (yIterator.hasNext()) {
-				int rowIntermediateProduct = yIterator.next() * xvalue + carry;
+				long rowIntermediateProduct = yIterator.next() * xvalue + carry;
 			
 				if (rowIntermediateProduct > 0) {
-					List<Integer> rowIntermediateBaseProductList = ConversionUtils.convertToBase(rowIntermediateProduct, BASE);	
+					List<Long> rowIntermediateBaseProductList = ConversionUtils.convertToBase(rowIntermediateProduct, BASE);	
 					if (rowIntermediateBaseProductList.size() > 1) {
 						carry = rowIntermediateBaseProductList.get(1);
 						rowIntermediateProduct = rowIntermediateBaseProductList.get(0);
@@ -317,8 +342,8 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 
 		NumberNode c = null;
 		
-		List<Integer> x = a.removeTrailingZeros().getValue();
-		List<Integer> y = b.removeTrailingZeros().getValue();
+		List<Long> x = a.removeTrailingZeros().getValue();
+		List<Long> y = b.removeTrailingZeros().getValue();
 		
 		boolean negative = a.isNegative() || a.isNegative();
 		
@@ -355,7 +380,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @param b
 	 * @return NumberNode
 	 */
-	public static NumberNode power(NumberNode x, int i) {
+	public static NumberNode power(NumberNode x, long i) {
 		if (i <= 0)
 			return new NumberNode(1);
 		else if (i == 1)
@@ -380,8 +405,8 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @param iterator
 	 * @return
 	 */
-	private static Integer getNext(Iterator<Integer> iterator) {
-		return (iterator.hasNext() ? iterator.next() : 0);
+	private static Long getNext(Iterator<Long> iterator) {
+		return (iterator.hasNext() ? iterator.next() : 0l);
 	}
 
 
