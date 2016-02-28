@@ -6,7 +6,7 @@ import java.util.ListIterator;
 
 public abstract class AbstractNumberNode {
 	
-	private List<Integer> value;
+	private List<Long> value;
 	
 	/**
 	 * getter function for input list
@@ -14,7 +14,7 @@ public abstract class AbstractNumberNode {
 	 * lazy initialization of value.
 	 * 
 	 */
-	protected List<Integer> getValue() {
+	protected List<Long> getValue() {
 		if (value == null)
 			value = new LinkedList<>();
 		return value;
@@ -23,7 +23,7 @@ public abstract class AbstractNumberNode {
 	/**
 	 * setter function for input list
 	 */
-	protected void setValue(List<Integer> input) {
+	protected void setValue(List<Long> input) {
 		this.value = input;
 	}
 	
@@ -32,7 +32,7 @@ public abstract class AbstractNumberNode {
 	 * 
 	 * @return
 	 */
-	protected Integer getLast() {
+	protected Long getLast() {
 		return (getValue() != null && getValue().size() > 0 ? getValue().get(getValue().size() - 1) : null);
 	}
 	
@@ -41,7 +41,7 @@ public abstract class AbstractNumberNode {
 	 * 
 	 * @param stringVal
 	 */
-	protected List<Integer> copyValue() {
+	protected List<Long> copyValue() {
 		return new LinkedList<>(getValue());
 	}
 	
@@ -51,7 +51,7 @@ public abstract class AbstractNumberNode {
 	 * @param stringVal
 	 */
 	protected void negateValue() {
-		ListIterator<Integer> valueListIterator = getValue().listIterator();
+		ListIterator<Long> valueListIterator = getValue().listIterator();
 		while (valueListIterator.hasNext())
 			valueListIterator.next();
 		
@@ -64,7 +64,7 @@ public abstract class AbstractNumberNode {
 	 * @return
 	 */
 	protected void removeTrailingZerosFromValue() {
-		ListIterator<Integer> valueListIterator = getValue().listIterator();
+		ListIterator<Long> valueListIterator = getValue().listIterator();
 		while (valueListIterator.hasNext())
 			valueListIterator.next();
 		
@@ -72,29 +72,28 @@ public abstract class AbstractNumberNode {
 			valueListIterator.remove();
 		
 		if (getValue().size() == 0)
-			getValue().add(0);
+			getValue().add(0l);
 	}
 
-	public abstract int getBaseValue();
+	protected abstract int getBaseValue();
 	
 	/**
 	 * helper function that computes the long value of the numberNode representation.
 	 * 
 	 * @return
 	 */
-	public long baseValue() {
+	public long baseRepresentation() {
 		long resultingNumber = 0;
 		int counter = 0;
 		
 		boolean foundNegative = false;
-		for (Integer integer : getValue()) {
-			if (integer < 0) {
+		for (Long longVal : getValue()) {
+			if (longVal < 0) {
 				foundNegative = true;
-				integer *= -1;
+				longVal *= -1;
 			}
-			resultingNumber += integer * Math.pow(getBaseValue(), counter ++);
+			resultingNumber += longVal * ConversionUtils.shiftBase(getBaseValue(), counter ++);
 		}
-		
 		return (foundNegative ? resultingNumber * -1 : resultingNumber) ; 
 	}
 	
@@ -104,14 +103,7 @@ public abstract class AbstractNumberNode {
 	 */
 	@Override
 	public String toString() {
-		StringBuffer sb = new StringBuffer();
-		sb.append("[ ");
-		
-		for (Integer element : getValue())
-			sb.append(element).append(" ");
-		
-		sb.append("] ");
-		return sb.toString();
+		return String.valueOf(baseRepresentation());
 	}
 	
 	/**
@@ -120,10 +112,10 @@ public abstract class AbstractNumberNode {
 	 * @param otherValue
 	 * @return
 	 */
-	protected Integer compareValues(List<Integer> otherValue) {
-		Integer returnVal = 0;
-		ListIterator<Integer> firstValueListIterator = getValue().listIterator();
-		ListIterator<Integer> secondValueListIterator = otherValue.listIterator();
+	protected Long compareValues(List<Long> otherValue) {
+		Long returnVal = 0l;
+		ListIterator<Long> firstValueListIterator = getValue().listIterator();
+		ListIterator<Long> secondValueListIterator = otherValue.listIterator();
 		
 		while (firstValueListIterator.hasNext())
 			firstValueListIterator.next();
@@ -132,14 +124,14 @@ public abstract class AbstractNumberNode {
 			secondValueListIterator.next();
 
 		while (firstValueListIterator.hasPrevious() && secondValueListIterator.hasPrevious()) {
-			Integer firstValue = firstValueListIterator.previous();
-			Integer secondValue = secondValueListIterator.previous();
+			Long firstValue = firstValueListIterator.previous();
+			Long secondValue = secondValueListIterator.previous();
 			
 			if (firstValue > secondValue) { 
-				returnVal = 1;
+				returnVal = 1l;
 				break;
 			} else if (firstValue < secondValue) { 
-				returnVal = -1;
+				returnVal = -1l;
 				break;
 			}
 		}
