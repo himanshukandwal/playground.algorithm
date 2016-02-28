@@ -10,11 +10,7 @@ import java.util.List;
 public class NumberNode extends AbstractNumberNode implements Comparable<NumberNode> {
 
 	// Required base in which operations to be performed.
-<<<<<<< HEAD
 	protected static final Integer BASE = 10;
-=======
-	private static final Integer BASE = 10;
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 
 	/**
 	 * Default Constructor
@@ -43,17 +39,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-<<<<<<< HEAD
-=======
-	 * overridden abstract method
-	 */
-	@Override
-	public int getBaseValue() {
-		return BASE;
-	}
-	
-	/**
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * Constructor with the Direct value
 	 * 
 	 * @param stringVal
@@ -63,7 +48,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * overridden abstract method
 	 */
 	@Override
@@ -72,8 +56,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-=======
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * helper function providing the copy with the Direct value
 	 * 
 	 * @param stringVal
@@ -159,11 +141,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * function that performs the sum of two positive NumberNode(s).
-=======
-	 * function that performs the sum of two NumberNode(s).
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * 
 	 * NumberNode c = NumberNode a + NumberNode b
 	 * 
@@ -172,39 +150,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @return NumberNode
 	 */
 	public static NumberNode sum(NumberNode a, NumberNode b) {
-<<<<<<< HEAD
-=======
-		NumberNode c = null;
-		
-		if (a.isNegative() && b.isNegative()) {
-			c = positiveSum(a.negate(), b.negate()).negate();
-		} 
-		else if (a.isNegative() || b.isNegative()) {
-			boolean isBiggerNumberNegative = (a.abs().compareTo(b.abs()) < 0 ? b.isNegative() : a.isNegative());
-			
-			c = positiveSubtract(a.isNegative() ? a.negate() : a, b.isNegative() ? b.negate() : b);
-			
-			if ((isBiggerNumberNegative && !c.isNegative()) || (!isBiggerNumberNegative && c.isNegative()))
-				c.negate();
-		}
-		else {
-			c = positiveSum(a, b);
-		}
-		
-		return c;
-	}
-	
-	/**
-	 * inner function that performs the sum of two positive NumberNode(s).
-	 * 
-	 * NumberNode c = NumberNode a + NumberNode b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return NumberNode
-	 */
-	private static NumberNode positiveSum(NumberNode a, NumberNode b) {
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 		List<Integer> x = a.getValue();
 		List<Integer> y = b.getValue();
 
@@ -240,11 +185,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 
 	/**
-<<<<<<< HEAD
 	 * function that performs the difference of two positive NumberNode(s).
-=======
-	 * function that performs the difference of two NumberNode(s).
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * 
 	 * NumberNode c = NumberNode a - NumberNode b
 	 * 
@@ -253,48 +194,11 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @return NumberNode
 	 */
 	public static NumberNode subtract(NumberNode a, NumberNode b) {
-<<<<<<< HEAD
-=======
-		NumberNode c = null;
-		
-		if (a.isNegative() && b.isNegative()) {
-			c = positiveSubtract(a.negate(), b.negate()).negate();
-		} 
-		else if (a.isNegative() || b.isNegative()) {
-			boolean toNegate = a.isNegative();
-			
-			c = positiveSum(a.isNegative() ? a.negate() : a, b.isNegative() ? b.negate() : b);
-			
-			if (toNegate)
-				c.negate();
-		}
-		else {
-			c = positiveSubtract(a, b);
-		}
-		
-		return c;
-	}
-	
-	/**
-	 * inner function that performs the difference of two positive NumberNode(s).
-	 * 
-	 * NumberNode c = NumberNode a - NumberNode b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return NumberNode
-	 */
-	private static NumberNode positiveSubtract(NumberNode a, NumberNode b) {
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 		a.removeTrailingZeros();
 		b.removeTrailingZeros();
 		
 		if (a.getValue().size() == 1 && a.getValue().get(0) == 0)
-<<<<<<< HEAD
 			return b.copy().negate();
-=======
-			return b.negate();
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 		else if (b.getValue().size() == 1 && b.getValue().get(0) == 0)
 			return a;
 		
@@ -346,34 +250,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @return NumberNode
 	 */
 	public static NumberNode product(NumberNode a, NumberNode b) {
-<<<<<<< HEAD
-=======
-		NumberNode c = null;
-		
-		if (a.isNegative() && b.isNegative()) {
-			c = positiveProduct(a.negate(), b.negate());
-		} 
-		else if (a.isNegative() || b.isNegative()) {
-			c = positiveProduct(a.isNegative() ? a.negate() : a, b.isNegative() ? b.negate() : b).negate();
-		}
-		else {
-			c = positiveProduct(a, b);
-		}
-		
-		return c;
-	}
-	
-	/**
-	 * inner function that performs the multiplication of two NumberNode(s).
-	 * 
-	 * NumberNode c = NumberNode a * NumberNode b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return NumberNode
-	 */
-	private static NumberNode positiveProduct(NumberNode a, NumberNode b) {
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 		
 		List<Integer> x = a.getValue();
 		List<Integer> y = b.getValue();
@@ -429,11 +305,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * inner function that performs the division operation on the two positive NumberNode(s).
-=======
-	 * function that performs the division operation on the two NumberNode(s).
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * 
 	 * NumberNode c = NumberNode a / NumberNode b
 	 * 
@@ -442,32 +314,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @return NumberNode
 	 */
 	public static NumberNode divide(NumberNode a, NumberNode b) {
-<<<<<<< HEAD
-=======
-		boolean toNegate = false;
-		
-		if ((a.isNegative() || b.isNegative()) && !(a.isNegative() && b.isNegative()))
-			toNegate = true;
-		
-		NumberNode c = positiveDivide(a.isNegative() ? a.negate() : a, b.isNegative() ? b.negate() : b);
-		
-		if (toNegate) 
-			c.negate();
-		
-		return c;
-	}
-	
-	/**
-	 * inner function that performs the division operation on the two positive NumberNode(s).
-	 * 
-	 * NumberNode c = NumberNode a / NumberNode b
-	 * 
-	 * @param a
-	 * @param b
-	 * @return NumberNode
-	 */
-	private static NumberNode positiveDivide(NumberNode a, NumberNode b) {
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 
 		NumberNode c = null;
 		
@@ -501,15 +347,9 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-<<<<<<< HEAD
 	 * function that performs the power operation on a NumberNode.
 	 * 
 	 * NumberNode c = NumberNode a ^ int b
-=======
-	 * function that performs the power operation on the two NumberNode(s).
-	 * 
-	 * NumberNode c = NumberNode a ^ NumberNode b
->>>>>>> 56b822adb529f12b546b095f51f51e77f89566c2
 	 * 
 	 * @param a
 	 * @param b
