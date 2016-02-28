@@ -236,18 +236,17 @@ public class ComplexNumberNode extends NumberNode {
 	public static NumberNode squareRoot(NumberNode a) {
 		if (isZero(a))
 			return a;
-
-		long aBaseRepresentation = a.baseRepresentation();
-		long low = 1;
-		long high = aBaseRepresentation;
 		
-		long sqrtVal = -1;
-		while ((low + 1) < high) {
-			long mid = (low + high) / 2;
+		NumberNode low = new NumberNode(1l);
+		NumberNode high = a.copy();
+		NumberNode sqrtVal = null;
+		
+		while (sum(low, ONE).compareTo(high) < 0) {
+			NumberNode mid = divide(sum(low, high), TWO);
 			
-			if (aBaseRepresentation < (mid * mid))
+			if (a.compareTo(product(mid, mid)) < 0)
 				high = mid;
-			else if (aBaseRepresentation > (mid * mid))
+			else if (a.compareTo(product(mid, mid)) > 0)
 				low = mid;
 			else {
 				sqrtVal = mid;
@@ -255,8 +254,8 @@ public class ComplexNumberNode extends NumberNode {
 			}
 		}
 		
-		sqrtVal = (sqrtVal == -1 ? low : sqrtVal);
-		return new NumberNode(ConversionUtils.convertToBase(sqrtVal, a.getBaseValue()));
+		sqrtVal = (sqrtVal == null ? low : sqrtVal);
+		return sqrtVal;
 	}
 	
 }
