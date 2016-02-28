@@ -6,54 +6,62 @@ import java.util.ListIterator;
 
 public class ConversionUtils {
 
-	public static List<Integer> convertToBase(String input, int base) {
+	public static List<Long> convertToBase(String input, int base) {
 		return convertToBase(Long.valueOf(input), base);
 	}
 	
-	public static List<Integer> convertToBase(long input, int base) {
+	public static List<Long> convertToBase(long input, int base) {
 		boolean isNegative = input < 0;
 
 		if (isNegative)
 			input *= -1;
 
-		List<Integer> resultingList = positiveConvertToBase(input, base);
+		List<Long> resultingList = positiveConvertToBase(input, base);
 
 		if (isNegative) {
-			ListIterator<Integer> listIterator = resultingList.listIterator();
+			ListIterator<Long> listIterator = resultingList.listIterator();
 			
 			while (listIterator.hasNext())
 				listIterator.next();
 			
-			listIterator.set(0 - resultingList.get(resultingList.size() - 1));
+			listIterator.set(0l - resultingList.get(resultingList.size() - 1));
 		}
 
 		return resultingList;
 	}
 	
-	private static List<Integer> positiveConvertToBase(long input, int base) {
-		List<Integer> resultingList = new LinkedList<>();
+	private static List<Long> positiveConvertToBase(long input, int base) {
+		List<Long> resultingList = new LinkedList<>();
 		
 		if (input > 0) {
 			while (input / base > 0 || input % base > 0) {
-				resultingList.add((int) (input % base));
+				resultingList.add(input % base);
 				input /= base;
 			}
 		} else {
-			resultingList.add(0);
+			resultingList.add(0l);
 		}
 		
 		return resultingList;
 	}
 	
-	public static boolean verifyBaseRepresentation(List<Integer> list, long input, int base) {
+	public static long shiftBase(int base, int times) {
+		long extendedBase = 1;
+		for (int counter = 0; counter < times; counter++)
+			extendedBase *= base;
+		
+		return extendedBase;
+	}
+	
+	public static boolean verifyBaseRepresentation(List<Long> list, long input, int base) {
 		if (input > 0 && (list == null || list.size() == 0))
 			return false;
 		
 		long resultingNumber = 0;
 		int counter = 0;
 		
-		for (Integer integer : list)
-			resultingNumber += integer * Math.pow(base, counter ++); 
+		for (Long longVal : list)
+			resultingNumber += longVal * Math.pow(base, counter ++); 
 
 		return (resultingNumber == input ? true : false);
 	}
