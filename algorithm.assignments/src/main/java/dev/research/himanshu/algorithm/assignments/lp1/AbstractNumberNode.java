@@ -4,6 +4,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Abstract class containing all the background code for the NumberNode class.
+ * 
+ * @author G31
+ *
+ */
 public abstract class AbstractNumberNode {
 	
 	private List<Long> value;
