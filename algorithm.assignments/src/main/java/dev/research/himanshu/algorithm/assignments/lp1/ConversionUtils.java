@@ -4,10 +4,31 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+/**
+ * Utility class for handing conversion operations.
+ * 
+ * @author G31
+ *
+ */
 public class ConversionUtils {
 
 	public static List<Long> convertToBase(String input, int base) {
-		return convertToBase(Long.valueOf(input), base);
+		List<Long> resultingList = null;
+		try {
+			resultingList = convertToBase(Long.valueOf(input), base);
+		} catch (NumberFormatException exception) {
+			int len = input.length();
+			String subString = input.substring(0, len/2);
+			
+			NumberNode temporaryNumberNode = new NumberNode(convertToBase(subString, base));
+			temporaryNumberNode.shift(subString.length());
+			
+			subString = input.substring(len/2);
+			NumberNode anotherTemporaryNumberNode = new NumberNode(convertToBase(subString, base));
+			
+			resultingList = NumberNode.sum(temporaryNumberNode, anotherTemporaryNumberNode).getValue();
+		}
+		return resultingList;
 	}
 	
 	public static List<Long> convertToBase(long input, int base) {
@@ -64,15 +85,6 @@ public class ConversionUtils {
 			resultingNumber += longVal * Math.pow(base, counter ++); 
 
 		return (resultingNumber == input ? true : false);
-	}
-	
-	public static void main(String[] args) {
-		System.out.println(verifyBaseRepresentation(convertToBase(1562322, 12), 1562322, 12));
-		System.out.println(verifyBaseRepresentation(convertToBase(1562322, 576), 1562322, 12));
-		System.out.println(verifyBaseRepresentation(convertToBase(1562322, 576), 1562322, 576));
-		System.out.println(verifyBaseRepresentation(convertToBase(0, 576), 0, 576));
-		System.out.println(verifyBaseRepresentation(convertToBase(-10, 10), 10, 10));
-		System.out.println(verifyBaseRepresentation(convertToBase(-10, 10), -10, 10));
 	}
 	
 }
