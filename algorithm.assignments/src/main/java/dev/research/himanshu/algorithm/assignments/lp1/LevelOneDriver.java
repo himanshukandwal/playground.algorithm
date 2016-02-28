@@ -3,26 +3,25 @@ package dev.research.himanshu.algorithm.assignments.lp1;
 public class LevelOneDriver {
 
 	public static void main(String[] args) {
-		String contentOffset = "\n\t";
-		NumberNode a = null;
-		NumberNode b = null;
+		NumberNode a = new NumberNode("1234567890123456789012345678901234567890");
+		NumberNode b = new NumberNode(999);
+		NumberNode c = NumberNode.sum(a, b);
+		NumberNode d = NumberNode.subtract(c, a);
+		NumberNode e = NumberNode.product(c, a);
+		NumberNode zero = new NumberNode(0);
+		NumberNode f = NumberNode.product(a, zero);
+		NumberNode two = new NumberNode(2);
+		NumberNode g = NumberNode.power(two, 1025);
+		System.out.println("a = " + a);
+		System.out.println("b = " + b);
+		System.out.println("c=a+b = " + c);
+		System.out.println("a+b-a = " + d);
+		System.out.println("a*c = " + e);
+		System.out.println("a*0 = " + f);
+		System.out.println("2^1025 = " + g);
+		System.out.println("Internal representation:");
+		g.printList();
 		
-		System.out.println(" This is Level 1 driver program, illustrating our implementation ! ");
-		System.out.println(" We have used the class 'NumberNode' to store the numbers in a list fashion and in format "
-				+ contentOffset + "Least significant digit -> Most significant digit");
-		System.out.println("\n\n let's review the working of the basic arithmetic operations !");
-		System.out.println(" a. Addition ");
-		 
-		a = new NumberNode(20);
-		b = new NumberNode(-2);
-		
-		System.out.println(" adding : 20, -2 "); 
-		a.printList(); 
-		b.printList(); 
-		System.out.println("result is : (18) ");
-		NumberNode.sum(new NumberNode(20), new NumberNode(-2)).printList();
-		
-
 	}
 
 }
