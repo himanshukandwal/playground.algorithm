@@ -109,7 +109,19 @@ public abstract class AbstractNumberNode {
 	 */
 	@Override
 	public String toString() {
-		return String.valueOf(baseRepresentation());
+		StringBuffer buffer = new StringBuffer();
+		
+		boolean foundNegative = false;
+		for (Long longVal : getValue()) {
+			if (longVal < 0) {
+				foundNegative = true;
+				longVal *= -1;
+			}
+			buffer.append(longVal);
+		}
+		String representation = buffer.reverse().toString();
+		
+		return (foundNegative ? "-" + representation : representation);
 	}
 	
 	/**
