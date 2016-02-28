@@ -43,8 +43,21 @@ public class ComplexNumberNode extends NumberNode {
 	 * 
 	 * @param stringVal
 	 */
-	public ComplexNumberNode(List<Integer> value) {
+	public ComplexNumberNode(List<Long> value) {
 		super(value);
+	}
+	
+	/**
+	 * helper function that checks whether a NumberNode is zero or not..
+	 * 
+	 * NumberNode c = NumberNode a ^ NumberNode b
+	 * 		
+	 * @param a
+	 * @param b
+	 * @return NumberNode
+	 */
+	public static boolean isZero(NumberNode a) {
+		return (a.getValue().size() == 1 && a.getLast() == 0);
 	}
 	
 	/**
@@ -171,14 +184,11 @@ public class ComplexNumberNode extends NumberNode {
 		a = (a.isNegative() ? a.negate() : a);
 		NumberNode c = new NumberNode(1);
 		
-		Iterator<Integer> powerNumberNodeIterator = b.getValue().iterator();
+		Iterator<Long> powerNumberNodeIterator = b.getValue().iterator();
 		int loopcounter = 0;
 		while (powerNumberNodeIterator.hasNext()) {
-			Integer powerVal = powerNumberNodeIterator.next();
-			if (loopcounter > 0) 
-				powerVal *= (loopcounter *= BASE);
-			else 
-				loopcounter = 1;
+			Long powerVal = powerNumberNodeIterator.next();
+			powerVal *= ConversionUtils.shiftBase(b.getBaseValue(), loopcounter ++);
 			
 			// c *= a ^ powerVal 
 			c = NumberNode.product(c, NumberNode.power(a, powerVal));
@@ -203,7 +213,7 @@ public class ComplexNumberNode extends NumberNode {
 		if ((b.getValue().size() == 1 && b.getValue().get(0) == 0))
 			throw new IllegalArgumentException("Argument 'divisor' is 0");
 		
-		if (a.compareTo(b) == 0 || (a.getValue().size() == 1 && a.getLast() == 0))
+		if (a.compareTo(b) == 0 || isZero(a))
 			return new NumberNode(0);
 		
 		NumberNode intermediateDifference = a; 
@@ -212,6 +222,41 @@ public class ComplexNumberNode extends NumberNode {
 		
 		NumberNode c = (intermediateDifference.isNegative() && (intermediateDifference.abs().compareTo(b.abs()) != 0) ? sum(b, intermediateDifference) : new NumberNode(0));		
 		return c;
+	}
+	
+	/**
+	 * function that performs the squareRoot operation on two NumberNode(s).
+	 * 
+	 * NumberNode c = NumberNode a ~ 
+	 * 		
+	 * @param a
+	 * @param b
+	 * @return NumberNode
+	 */
+	public static NumberNode squareRoot(NumberNode a) {
+		if (isZero(a))
+			return a;
+
+		long aBaseRepresentation = a.baseRepresentation();
+		long low = 1;
+		long high = aBaseRepresentation;
+		
+		long sqrtVal = -1;
+		while ((low + 1) < high) {
+			long mid = (low + high) / 2;
+			
+			if (aBaseRepresentation < (mid * mid))
+				high = mid;
+			else if (aBaseRepresentation > (mid * mid))
+				low = mid;
+			else {
+				sqrtVal = mid;
+				break;
+			}
+		}
+		
+		sqrtVal = (sqrtVal == -1 ? low : sqrtVal);
+		return new NumberNode(ConversionUtils.convertToBase(sqrtVal, a.getBaseValue()));
 	}
 	
 }
