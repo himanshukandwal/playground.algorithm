@@ -30,7 +30,6 @@ public class LevelTwoDriver {
 			inputScanner = new Scanner(System.in);
 		}
 
-		/* we can also use '!' to signal end of commands */
 		while (inputScanner.hasNext()) {
 			linenum = inputScanner.nextInt();
 			cmd = inputScanner.next();
