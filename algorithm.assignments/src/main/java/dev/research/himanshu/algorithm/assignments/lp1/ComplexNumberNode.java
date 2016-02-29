@@ -258,4 +258,19 @@ public class ComplexNumberNode extends NumberNode {
 		return sqrtVal;
 	}
 	
+	/**
+	 * function that computes the factorial operation on the NumberNode passed.
+	 * 
+	 * NumberNode c = NumberNode a ! 
+	 * 		
+	 * @param a
+	 * @param b
+	 * @return NumberNode
+	 */
+	public static NumberNode factorial(NumberNode a) {
+		if (isZero(a) || a.isNegative())
+			return ONE.copy();
+		
+		return product(a, factorial(subtract(a, ONE)));
+	}
 }
