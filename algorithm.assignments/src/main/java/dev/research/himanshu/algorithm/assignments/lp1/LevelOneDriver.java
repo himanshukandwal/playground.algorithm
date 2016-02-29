@@ -1,5 +1,12 @@
 package dev.research.himanshu.algorithm.assignments.lp1;
 
+/**
+ * Driver Class for level 1.
+ * 
+ * @author rbk
+ * @modifier G31
+ *
+ */
 public class LevelOneDriver {
 
 	public static void main(String[] args) {
@@ -21,7 +28,6 @@ public class LevelOneDriver {
 		System.out.println("2^1025 = " + g);
 		System.out.println("Internal representation:");
 		g.printList();
-		
 	}
 
 }
