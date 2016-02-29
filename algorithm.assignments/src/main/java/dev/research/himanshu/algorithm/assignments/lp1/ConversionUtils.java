@@ -14,14 +14,18 @@ public class ConversionUtils {
 
 	public static List<Long> convertToBase(String input, int base) {
 		List<Long> resultingList = null;
-		try {
+		if (input.length() <= 4) {
 			resultingList = convertToBase(Long.valueOf(input), base);
-		} catch (NumberFormatException exception) {
+		} else {
 			int len = input.length();
 			String subString = input.substring(0, len/2);
 			
 			NumberNode temporaryNumberNode = new NumberNode(convertToBase(subString, base));
-			temporaryNumberNode.shift(subString.length());
+			StringBuffer sb = new StringBuffer().append(1);
+			for (int loop = 0; loop < len - subString.length(); loop++)
+				sb.append("0");
+			
+			temporaryNumberNode = NumberNode.product(temporaryNumberNode, new NumberNode(sb.toString()));
 			
 			subString = input.substring(len/2);
 			NumberNode anotherTemporaryNumberNode = new NumberNode(convertToBase(subString, base));
