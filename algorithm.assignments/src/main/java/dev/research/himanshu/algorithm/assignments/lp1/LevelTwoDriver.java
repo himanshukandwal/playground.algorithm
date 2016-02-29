@@ -1,5 +1,7 @@
 package dev.research.himanshu.algorithm.assignments.lp1;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -14,27 +16,31 @@ import java.util.Scanner;
  */
 public class LevelTwoDriver {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException {
 		Queue<String> commandQueue = new LinkedList<>();
 		
+		Scanner inputScanner;
 		int linenum;
 		String cmd;
-		Scanner inputScanner = new Scanner(System.in);
 		
+		if (args.length > 0) {
+			File inputFile = new File(args[0]);
+			inputScanner = new Scanner(inputFile);
+		} else {
+			inputScanner = new Scanner(System.in);
+		}
+
 		/* we can also use '!' to signal end of commands */
 		while (inputScanner.hasNext()) {
-			String val = inputScanner.next();
-		    if(val.equals("!"))
-		        break; 
-		    
-			linenum = Integer.valueOf(val);
+			linenum = inputScanner.nextInt();
 			cmd = inputScanner.next();
 			commandQueue.add(cmd);
-			
+
 			System.out.println("|" + linenum + "|" + cmd + "|");
 		}
-		
+
 		inputScanner.close();
+
 		int loopingCounter = 0;
 		
 		Map<String, NumberNode> metaMap = new HashMap<>();
@@ -45,6 +51,17 @@ public class LevelTwoDriver {
 				continue;
 			}	
 			
+			if (!command.contains("=")) {
+				NumberNode numberNode = null;
+				
+				if (metaMap.containsKey(command.trim())) {
+					numberNode = metaMap.get(command.trim());
+					System.out.println(" displaying variable : " + command);
+					numberNode.printList();
+				}
+				continue;
+			}
+
 			String variable = command.split("=")[0];
 			String expression = command.split("=")[1];
 			
@@ -145,6 +162,8 @@ public class LevelTwoDriver {
 				
 				metaMap.put(variable, result);
 			}	
+			
+			System.out.println();
 		}
 	}
 	
