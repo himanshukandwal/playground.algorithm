@@ -45,20 +45,24 @@ public class LevelTwoDriver {
 		
 		Map<String, NumberNode> metaMap = new HashMap<>();
 		while (!commandQueue.isEmpty()) {
-			String command =  commandQueue.poll();
+			String command =  commandQueue.poll().trim();
+			
 			if (loopingCounter ++ < 2) {
 				metaMap.put(command.split("=")[0].trim(), new ComplexNumberNode(command.split("=")[1].trim()));
+				System.out.println();
 				continue;
 			}	
 			
 			if (!command.contains("=")) {
 				NumberNode numberNode = null;
 				
-				if (metaMap.containsKey(command.trim())) {
-					numberNode = metaMap.get(command.trim());
+				if (metaMap.containsKey(command)) {
+					numberNode = metaMap.get(command);
 					System.out.println(" displaying variable : " + command);
+					System.out.println( numberNode + " (decimal representation) ");
 					numberNode.printList();
 				}
+				System.out.println();
 				continue;
 			}
 
@@ -161,7 +165,19 @@ public class LevelTwoDriver {
 				result.printList();
 				
 				metaMap.put(variable, result);
-			}	
+			} else if (expression.contains("!")) {
+				System.out.println(" output for : " + command);
+				
+				String operandA = expression.split("\\!")[0];
+				
+				NumberNode result = ComplexNumberNode.factorial(
+						(isVariableDigit(operandA) ? new NumberNode(Integer.valueOf(operandA)) : metaMap.get(operandA)));
+				
+				System.out.println( result + " (decimal representation) ");
+				result.printList();
+				
+				metaMap.put(variable, result);
+			}		
 			
 			System.out.println();
 		}
