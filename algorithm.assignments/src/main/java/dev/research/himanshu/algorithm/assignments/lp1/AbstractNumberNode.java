@@ -102,28 +102,7 @@ public abstract class AbstractNumberNode {
 		}
 		return (foundNegative ? resultingNumber * -1 : resultingNumber) ; 
 	}
-	
-	/**
-	 * overridden toString method.
-	 * 
-	 */
-	@Override
-	public String toString() {
-		StringBuffer buffer = new StringBuffer();
 		
-		boolean foundNegative = false;
-		for (Long longVal : getValue()) {
-			if (longVal < 0) {
-				foundNegative = true;
-				longVal *= -1;
-			}
-			buffer.append(longVal);
-		}
-		String representation = buffer.reverse().toString();
-		
-		return (foundNegative ? "-" + representation : representation);
-	}
-	
 	/**
 	 * helper function to compare two values.
 	 *  
