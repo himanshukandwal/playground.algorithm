@@ -463,7 +463,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * 
 	 * @return
 	 */
-	public String base10Representation() {
+	private String base10Representation() {
 		NumberNode resultingNode = ZERO.copy().setUseDecimalBase(true);
 		NumberNode powerNode = ONE.copy().setUseDecimalBase(true);
 		
