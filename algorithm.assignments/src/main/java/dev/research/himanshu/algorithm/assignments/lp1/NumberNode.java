@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Main Class implementing all of the features of Level 1 problems.
+ * 
  * @author G31
  */
 public class NumberNode extends AbstractNumberNode implements Comparable<NumberNode> {
@@ -491,7 +493,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	
 	/**
 	 * overridden toString method.
-	 * 
 	 */
 	@Override
 	public String toString() {
