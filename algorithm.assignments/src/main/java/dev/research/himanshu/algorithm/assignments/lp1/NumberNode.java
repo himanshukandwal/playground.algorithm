@@ -10,18 +10,29 @@ import java.util.List;
 public class NumberNode extends AbstractNumberNode implements Comparable<NumberNode> {
 
 	// Required base in which operations to be performed.
-	protected static final Integer BASE = 10;
+	protected static final Integer BASE = 15;
+	
+	protected static final NumberNode ZERO = new NumberNode(0);
 	
 	protected static final NumberNode ONE = new NumberNode(1);
 	
 	protected static final NumberNode TWO = new NumberNode(2);
 
+	private boolean useDecimalBase;
+	
 	/**
 	 * Default Constructor
 	 */
 	public NumberNode() {
 	}
 
+	/**
+	 * Decimal base Constructor
+	 */
+	public NumberNode(boolean useDecimalBase) {
+		this.useDecimalBase = useDecimalBase;
+	}
+	
 	/**
 	 * Constructor with the long Parameter
 	 * 
@@ -30,7 +41,19 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @param stringVal
 	 */
 	public NumberNode(long longVal) {
-		setValue(ConversionUtils.convertToBase(longVal, BASE));
+		setValue(ConversionUtils.convertToBase(longVal, getBaseValue()));
+	}
+	
+	/**
+	 * Constructor with the long Parameter and Decimal Base.
+	 * 
+	 * Convert to required base and calls add to "this" List method(fillNumber).
+	 * 
+	 * @param stringVal
+	 */
+	public NumberNode(long longVal, boolean useDecimalBase) {
+		this(useDecimalBase);
+		setValue(ConversionUtils.convertToBase(longVal, getBaseValue()));
 	}
 
 	/**
@@ -39,7 +62,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 * @param stringVal
 	 */
 	public NumberNode(String stringVal) {
-		setValue(ConversionUtils.convertToBase(stringVal, BASE));
+		setValue(ConversionUtils.convertToBase(stringVal, getBaseValue()));
 	}
 	
 	/**
@@ -56,7 +79,28 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 */
 	@Override
 	protected int getBaseValue() {
+		if (isUseDecimalBase())
+			return 10;
 		return BASE;
+	}
+	
+	/**
+	 * getter function for field useDecimalBase.
+	 * 
+	 * @return
+	 */
+	public boolean isUseDecimalBase() {
+		return useDecimalBase;
+	}
+	
+	/**
+	 * setter function for field useDecimalBase.
+	 * 
+	 * @return
+	 */
+	public NumberNode setUseDecimalBase(boolean useDecimalBase) {
+		this.useDecimalBase = useDecimalBase;
+		return this;
 	}
 	
 	/**
@@ -120,7 +164,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	 */
 	public void printList() {
 		StringBuffer sb = new StringBuffer();
-		sb.append(BASE + " : ");
+		sb.append(getBaseValue() + " : ");
 
 		for (Long element : getValue())
 			sb.append(element).append(" ");
@@ -168,7 +212,6 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		return this;
 	}
 	
-	
 	/**
 	 * function that performs the sum of two positive NumberNode(s).
 	 * 
@@ -182,7 +225,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		List<Long> x = a.getValue();
 		List<Long> y = b.getValue();
 
-		NumberNode c = new NumberNode();
+		NumberNode c = new NumberNode(a.isUseDecimalBase());
 		List<Long> z = c.getValue();
 		
 		long carry = 0;
@@ -195,7 +238,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 			long addedSum = getNext(xIterator) + getNext(yIterator) + carry;
 			
 			if (addedSum > 0) {
-				List<Long> innerIntermediateSumList = ConversionUtils.convertToBase(addedSum, BASE);
+				List<Long> innerIntermediateSumList = ConversionUtils.convertToBase(addedSum, a.getBaseValue());
 				if (innerIntermediateSumList.size() > 1) {
 					carry = innerIntermediateSumList.get(1);
 					addedSum = innerIntermediateSumList.get(0);
@@ -236,7 +279,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		List<Long> x = (negative ? b.getValue() : a.getValue());
 		List<Long> y = (negative ? a.getValue() : b.getValue());
 		
-		NumberNode c = new NumberNode();
+		NumberNode c = new NumberNode(a.isUseDecimalBase());
 		List<Long> z = c.getValue();
 		
 		int borrow = 0;
@@ -254,13 +297,13 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 			Long secondValue = getNext(yIterator);
 			if (secondValue > firstValue) {
 				borrow ++;
-				firstValue = firstValue + BASE;
+				firstValue = firstValue + a.getBaseValue();
 			}
 			
 			Long intermediateResult = firstValue - secondValue;
 			
 			if (intermediateResult > 0)
-				intermediateResult = ConversionUtils.convertToBase(intermediateResult, BASE).get(0);
+				intermediateResult = ConversionUtils.convertToBase(intermediateResult, a.getBaseValue()).get(0);
 			
 			z.add(intermediateResult);
 		}
@@ -283,7 +326,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		List<Long> x = a.getValue();
 		List<Long> y = b.getValue();
 
-		NumberNode c = new NumberNode(0);
+		NumberNode c = new NumberNode(0, a.isUseDecimalBase());
 		
 		Iterator<Long> xIterator = x.iterator();
 		
@@ -310,7 +353,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 				long rowIntermediateProduct = yIterator.next() * xvalue + carry;
 			
 				if (rowIntermediateProduct > 0) {
-					List<Long> rowIntermediateBaseProductList = ConversionUtils.convertToBase(rowIntermediateProduct, BASE);	
+					List<Long> rowIntermediateBaseProductList = ConversionUtils.convertToBase(rowIntermediateProduct, a.getBaseValue());	
 					if (rowIntermediateBaseProductList.size() > 1) {
 						carry = rowIntermediateBaseProductList.get(1);
 						rowIntermediateProduct = rowIntermediateBaseProductList.get(0);
@@ -326,7 +369,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 				productRowRepresentation.getValue().add(carry);
 			
 			/* c += productRowRepresentation */
-			c = NumberNode.sum (c, productRowRepresentation);
+			c = NumberNode.sum (c, productRowRepresentation).setUseDecimalBase(a.isUseDecimalBase());
 			rowOffset ++;
 		}
 		
@@ -369,7 +412,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 			if (intermediateDifference.isNegative())
 				count --;
 
-			c = new NumberNode(count);
+			c = new NumberNode(count, a.isUseDecimalBase());
 		}
 		
 		return (negative ? c.negate() : c);
@@ -402,7 +445,7 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 	}
 	
 	/**
-	 * Helper function to Iterate and return the next value.
+	 * helper function to Iterate and return the next value.
 	 * 
 	 * Returns 0 if list has ended.
 	 * 
@@ -413,5 +456,46 @@ public class NumberNode extends AbstractNumberNode implements Comparable<NumberN
 		return (iterator.hasNext() ? iterator.next() : 0l);
 	}
 
-
+	/**
+	 * helper function that computes the base10 string representation of the numberNode.
+	 * 
+	 * @return
+	 */
+	public String base10Representation() {
+		NumberNode resultingNode = ZERO.copy().setUseDecimalBase(true);
+		NumberNode powerNode = ONE.copy().setUseDecimalBase(true);
+		
+		NumberNode baseValueNumberNode = new NumberNode(getBaseValue(), true);
+		
+		for (int loop = 0; loop < getValue().size(); loop++) {
+			if (loop > 0)
+				powerNode = product(powerNode, baseValueNumberNode).setUseDecimalBase(true);
+			
+			NumberNode intermediateProduct = product(powerNode, new NumberNode(getValue().get(loop), true)).setUseDecimalBase(true);
+			resultingNode = sum(resultingNode, intermediateProduct).setUseDecimalBase(true);
+		}
+		
+		StringBuffer buffer = new StringBuffer();
+		boolean foundNegative = false;
+		
+		for (Long longVal : resultingNode.getValue()) {
+			if (longVal < 0) {
+				foundNegative = true;
+				longVal *= -1;
+			}
+			buffer.append(longVal);
+		}
+		String representation = buffer.reverse().toString();
+		return (foundNegative ? "-" + representation : representation);
+	}
+	
+	/**
+	 * overridden toString method.
+	 * 
+	 */
+	@Override
+	public String toString() {
+		return base10Representation();
+	}
+	
 }
