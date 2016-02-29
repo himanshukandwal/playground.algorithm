@@ -84,6 +84,8 @@ public abstract class AbstractNumberNode {
 	protected abstract int getBaseValue();
 	
 	/**
+	 * for (unit) testing purpose only. function does not appear anywhere in other source classes. 
+	 * 
 	 * helper function that computes the long value of the numberNode representation.
 	 * 
 	 * @return
