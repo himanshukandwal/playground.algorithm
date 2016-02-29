@@ -106,4 +106,11 @@ public class ComplexNumberNodeTest extends TestCase {
 			assertEquals(Double.valueOf(Math.sqrt(number)).longValue(), ComplexNumberNode.squareRoot(new ComplexNumberNode(number)).baseRepresentation());
 	}
 	
+	public void testFactorial() throws Exception {
+		assertEquals("6", ComplexNumberNode.factorial(new ComplexNumberNode(3)).toString());
+		assertEquals("120", ComplexNumberNode.factorial(new ComplexNumberNode(5)).toString());
+		assertEquals("5040", ComplexNumberNode.factorial(new ComplexNumberNode(7)).toString());
+		assertEquals("3628800", ComplexNumberNode.factorial(new ComplexNumberNode(10)).toString());
+	}
+	
 }
