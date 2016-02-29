@@ -52,7 +52,12 @@ public class NumberNodeTest extends TestCase {
 		assertEquals(32, NumberNode.power(new NumberNode(2), 5).baseRepresentation());
 		assertEquals(64, NumberNode.power(new NumberNode(2), 6).baseRepresentation());
 		assertEquals(128, NumberNode.power(new NumberNode(2), 7).baseRepresentation());
-		
+	}
+	
+	public void testBaseRepresentation() throws Exception {
+		assertEquals("12345", new NumberNode(12345).base10Representation());
+		assertEquals("123453456789012345345678901234534567890123453456789012345345678901234534567890", 
+				new NumberNode("123453456789012345345678901234534567890123453456789012345345678901234534567890").base10Representation());
 	}
 	
 }
