@@ -14,9 +14,9 @@ public class ConversionUtils {
 
 	public static List<Long> convertToBase(String input, int base) {
 		List<Long> resultingList = null;
-		if (input.length() <= 4) {
+		try {
 			resultingList = convertToBase(Long.valueOf(input), base);
-		} else {
+		} catch (NumberFormatException exception) {
 			int len = input.length();
 			String subString = input.substring(0, len/2);
 			
