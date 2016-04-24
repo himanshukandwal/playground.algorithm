@@ -1,5 +1,8 @@
 package dev.research.himanshu.algorithm.assignments.assignment5;
 
+import java.util.Map;
+import java.util.WeakHashMap;
+
 /**
  * A simple collection class implementing linear hashing for storage.
  * 
@@ -10,9 +13,17 @@ package dev.research.himanshu.algorithm.assignments.assignment5;
  */
 public class HashFunction<T> {
 	
-	private final int hashPrime = 37;
+	private final int hashPrime = 31;
 	private int weight;
 	private int bias;
+	private Map<T, Integer> cachedHashcodes;
+	
+	public Map<T, Integer> getCachedHashcodes() {
+		if (cachedHashcodes == null)
+			cachedHashcodes = new WeakHashMap<T, Integer>();
+
+		return cachedHashcodes;
+	}
 	
 	public HashFunction(int weight, int bias) {
 		this.weight = weight;
@@ -36,8 +47,11 @@ public class HashFunction<T> {
 	}
 	
 	public int hash(T object) {
-		int hashValue = ((weight * object.hashCode() + bias) % hashPrime);
-		return (hashValue ^ hashValue >>> 16);
+		if (!getCachedHashcodes().containsKey(object)) {
+			int hashValue = (hashPrime * weight * object.hashCode()) + bias;
+			getCachedHashcodes().put(object, hashValue);
+		}
+		return getCachedHashcodes().get(object);
 	}
 
 }

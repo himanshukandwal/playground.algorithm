@@ -20,7 +20,7 @@ public class Vertex {
 	 * 
 	 * @param n : int - name of the vertex
 	 */
-	Vertex(int n) {
+	public Vertex(int n) {
 		name = n;
 		seen = false;
 		parent = null;

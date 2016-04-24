@@ -9,6 +9,7 @@ class Graph implements Iterable<Vertex> {
 	
 	public List<Vertex> verts; // array of vertices
 	public int numNodes; // number of vertices in the graph
+	public int numEdges; // number of vertices in the graph
 
 	/**
 	 * Constructor for Graph
@@ -22,6 +23,11 @@ class Graph implements Iterable<Vertex> {
 		// create an array of Vertex objects
 		for (int i = 1; i <= size; i++)
 			verts.add(i, new Vertex(i));
+	}
+	
+	Graph(int size, int edges) {
+		this(size);
+		this.numEdges = edges;
 	}
 
 	/**
@@ -64,7 +70,7 @@ class Graph implements Iterable<Vertex> {
 	/**
 	 * A Custom Iterator Class for iterating through the vertices in a graph
 	 *
-	 * @param <GraphVertex>
+	 * @param <Vertex>
 	 */
 	private class VertexIterator implements Iterator<Vertex> {
 		private Iterator<Vertex> it;
@@ -110,7 +116,7 @@ class Graph implements Iterable<Vertex> {
 		int m = in.nextInt(); // number of edges in the graph
 
 		// create a graph instance
-		Graph g = new Graph(n);
+		Graph g = new Graph(n, m);
 		for (int i = 0; i < m; i++) {
 			int u = in.nextInt();
 			int v = in.nextInt();

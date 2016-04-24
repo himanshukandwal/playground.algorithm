@@ -3,11 +3,14 @@ package dev.research.himanshu.algorithm.assignments.assignment3;
 /**
  * Class that represents an arc in a Graph
  *
+ * @author rbk
+ * 
  */
 public class Edge {
 	public Vertex From; // head vertex
 	public Vertex To; // tail vertex
 	public int Weight;// weight of the arc
+	public boolean seen;// weight of the arc
 
 	/**
 	 * Constructor for Edge

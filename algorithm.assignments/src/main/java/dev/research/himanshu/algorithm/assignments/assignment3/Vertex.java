@@ -1,27 +1,31 @@
 package dev.research.himanshu.algorithm.assignments.assignment3;
 
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Class to represent a vertex of a graph
  * 
- *
+ * @author rbk
+ * @modified by G31 (Himanshu Kandwal and Dharmam Buch)
  */
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-public class Vertex implements Index, Comparator<Vertex>{
+public class Vertex implements Index {
 	
-	public int name; 				// name of the vertex
 	public int index;
-	public boolean seen;		 	// flag to check if the vertex has already been visited
-	public Vertex parent; 			// parent of the vertex
-	public int distance; 			// distance to the vertex from the source vertex
-	public List<Edge> Adj, revAdj; 	// adjacency list; use LinkedList or ArrayList
-
+	public Integer rank; // vertex rank
+	public int name; // name of the vertex
+	public boolean seen; // flag to check if the vertex has already been visited
+	public Vertex parent; // parent of the vertex
+	public Integer distance; // distance to the vertex from the source vertex
+	public List<Edge> Adj, revAdj; // adjacency list; use LinkedList or
+									// ArrayList
+	
 	/**
 	 * Constructor for the vertex
 	 * 
-	 * @param n : int - name of the vertex
+	 * @param n
+	 *            : int - name of the vertex
 	 */
 	Vertex(int n) {
 		name = n;
@@ -37,11 +41,6 @@ public class Vertex implements Index, Comparator<Vertex>{
 	public String toString() {
 		return Integer.toString(name);
 	}
-
-	@Override
-	public int compare(Vertex vertex1, Vertex vertex2) {
-		return (vertex1.distance < vertex2.distance) ? -1 : ((vertex1.distance == vertex2.distance) ? 0 : 1);
-	}
 	
 	@Override
 	public void putIndex(int index) {
@@ -52,4 +51,5 @@ public class Vertex implements Index, Comparator<Vertex>{
 	public int getIndex() {
 		return index;
 	}
+
 }

@@ -6,29 +6,35 @@ import java.util.Comparator;
 //Ver 1.0:  Wec, Feb 3.  Initial description.
 
 /**
- * @author G31
+ * @author rbk
+ * @modified by G31 (Himanshu Kandwal and Dharmam Buch)
  */
 public class BinaryHeap<T> implements PQ<T> {
+	
 	protected T[] pq;
 	protected Comparator<T> c;
-	private Integer maxsize;
+	protected Integer maxsize;
 	
 	/** Build a priority queue with a given array q */
 	BinaryHeap(T[] q, Comparator<T> comp) {
 		pq = q;
 		c = comp;
 		maxsize = q.length;
-		buildHeap();
+		buildHeap(true);
 	}
 
 	/** Create an empty priority queue of given maximum size */
+	@SuppressWarnings("unchecked")
 	BinaryHeap(int n, Comparator<T> comp) {
-		maxsize = n;
+		maxsize = n + 1;
 		c = comp;
 		pq = (T []) new Object [1];
-		pq[0] = null;
+		pq [0] = null;
 	}
 
+	public BinaryHeap() {
+	}
+	
 	public void insert(T x) {
 		add(x);
 	}
@@ -46,10 +52,13 @@ public class BinaryHeap<T> implements PQ<T> {
 			System.out.println("cannot add more elements. Priority queue reached max size [" + maxsize + "]");
 		} else {
 			pq = Arrays.copyOf(pq, pq.length + 1);
-			assignIndex(x, pq.length - 1);
-			assignIndex(pq[pq.length - 1], 0);
+			
+			pq [pq.length - 1] = x;
+			pq [0] = pq [pq.length - 1];
+			associateIndex(pq [pq.length - 1], pq.length - 1);
+			
 			percolateUp(pq.length - 1);
-			pq[0] = null;
+			pq [0] = null;
 		}
 	}
 
@@ -58,7 +67,9 @@ public class BinaryHeap<T> implements PQ<T> {
 		if (pq.length > 1) {
 			returnVal = pq [1];
 			
-			assignIndex(pq [pq.length - 1], 1);
+			pq [1] = pq [pq.length - 1];
+			associateIndex(pq [1], 1);
+			
 			pq = Arrays.copyOf (pq, pq.length - 1);
 
 			percolateDown (1);
@@ -73,17 +84,16 @@ public class BinaryHeap<T> implements PQ<T> {
 	/** pq[i] may violate heap order with parent */
 	public void percolateUp (int i) {
 		if (c.compare (pq [i], pq [i / 2]) < 0) {
-			assignIndex(pq [i / 2], i);
-			assignIndex(pq [0], i / 2);
+			associateIndex(pq [i], i / 2);
+			associateIndex(pq [i / 2], i);
+			
+			pq [i] = pq [i / 2];
+			pq [i / 2] = pq [0];
 			
 			percolateUp (i / 2);
 		}
 	}
 	
-	public void assignIndex(T t, int index) {
-		pq [index] = t;
-	}
-
 	/** pq[i] may violate heap order with children */
 	public void percolateDown(int i) {
 		if (i < pq.length && (2 * i < pq.length || (2 * i + 1) < pq.length)) {
@@ -96,95 +106,137 @@ public class BinaryHeap<T> implements PQ<T> {
 				index = 2 * i;
 				
 			if (c.compare (pq [i], pq [index]) > 0) {
+				associateIndex(pq [i], index);
+				associateIndex(pq [index], i);
+				
 				pq [0] = pq [i];
 				pq [i] = pq [index];
 				pq [index] = pq [0];
 				pq [0] = null;
-
+				
 				percolateDown (index);
 			}
 		}
 	}
 
-	/** Create a heap. Precondition: none. */
 	void buildHeap() {
-		heapSort(pq, c);
+		buildHeap(false);
 	}
-
+	
+	/** Create a heap. Precondition: none. */
+	void buildHeap(boolean isInitial) {
+		for (int index = (isInitial ? pq.length -1 : pq.length/2); index > 0; index --)
+			heapify(index);
+	}
+	
 	/*
-	 * sort array A [1..n]. A [0] is not used. Sorted order depends on comparator used to buid heap.
+	 * sort array A [1..n]. A [0] is not used. Sorted order depends on comparator used to build heap.
 	 *    	min heap ==> descending order 
 	 * 		max heap ==> ascending order
 	 */
 	public static <T> void heapSort(T[] A, Comparator<T> comp) {
 		for (int index = A.length/2; index > 0; index --)
-			heapify(A, index, comp);
+			heapify(A, 0, index, comp);
+		
+		for (int index = 0; index < A.length -1; index++) {
+			if (A [index] != null) {
+				A [0] = A [index + 1];
+				A [index + 1] = A [A.length -1];
+				A [A.length -1] = A [0];
+				A [0] = null;
+				
+				for (int innerIndex = (index + 1 + ((A.length - (index + 1)) /2)); innerIndex > index; innerIndex --)
+					heapify(A, index + 1, innerIndex, comp);
+			}
+		}
 	}
 	
-	public static <T> void heapify(T[] A, int index, Comparator<T> comp) {
+	public void heapify(int index) {
 		int leftIndex = 2 * index;
 		int rightIndex = 2 * index + 1;
 		Integer minima = null;
 		
-		if (leftIndex < A.length) {
-			if (comp.compare(A[leftIndex], A[index]) < 0) {
+		associateIndex(pq [index], index);
+		if (leftIndex < pq.length) {
+			if (c.compare(pq [leftIndex], pq[index]) < 0) {
 				minima = leftIndex;
 			} else {
 				minima = index;
 			}
 		}
 		
-		if (rightIndex < A.length) {
-			if (comp.compare(A[rightIndex], A [minima]) < 0) {
+		if (rightIndex < pq.length) {
+			if (c.compare(pq[rightIndex], pq [minima]) < 0) {
 				minima = rightIndex;
 			}
 		}
 		
 		if (minima != null && minima != index) {
-			A[0] = A[index];
-			A[index] = A [minima];
-			A[minima] = A[0];
-			A[0] = null;
-			heapify(A, minima, comp);
+			associateIndex(pq [minima], index);
+			associateIndex(pq [index], minima);
+			
+			pq [0] = pq [index];
+			pq [index] = pq [minima];
+			pq [minima] = pq [0];
+			pq [0] = null;
+			
+			heapify (minima);
+		}
+	}
+	
+	public static <T> void heapify(T[] A, int beginIndex, int index, Comparator<T> comp) {
+		index -= beginIndex;
+		
+		int length = A.length - beginIndex;
+		int leftIndex = 2 * index;
+		int rightIndex = 2 * index + 1;
+		Integer minima = null;
+		
+		if (leftIndex < length) {
+			if (comp.compare(A [beginIndex + leftIndex], A [beginIndex + index]) < 0) {
+				minima = leftIndex;
+			} else {
+				minima = index;
+			}
+		}
+		
+		if (rightIndex < length) {
+			if (comp.compare(A [beginIndex + rightIndex], A [beginIndex + minima]) < 0) {
+				minima = rightIndex;
+			}
+		}
+		
+		if (minima != null && minima != index) {
+			A [0] = A [beginIndex + index];
+			A [beginIndex + index] = A [beginIndex + minima];
+			A [beginIndex + minima] = A [0];
+			A [0] = null;
+			heapify(A, beginIndex, beginIndex + minima, comp);
 		}
 	}
 	
 	public T[] getPq() {
-		return pq;
+		return (T[]) pq;
 	}
-
-	public static void main(String[] args) {
-		Integer[] intArr = new Integer[] { null, 10, 7, 8, 9, 100, 0, 19, 13, 3, -19, 15, 677, 385 };
-
-		Comparator<Integer> intComparator = new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return o1.compareTo(o2);
-			}
-		};
-		
-		BinaryHeap<Integer> binaryHeap = new BinaryHeap<>(intArr, intComparator);
-		
-		System.out.println("Created heap !");
-		
-		for (Integer integer : intArr) {
-			System.out.println(integer);
-		}
-		
-		System.out.println(" deleting now : ");
-		Integer deletedValue = null;
-		while ((deletedValue = binaryHeap.deleteMin()) != null) {
-			System.out.println(deletedValue);
-		}
-		
-		intArr = new Integer[] { null, 10, 7, 8, 9, 100, 0, 19, 13, 3, -19, 15, 677, 385 };
-		
-		System.out.println(" -- With Sorting !");
-		BinaryHeap.heapSort(intArr, intComparator);
-		
-		for (int index = 0; index < intArr.length; index++) {
-			System.out.println(intArr [index]);
-		}
 	
+	public int size() {
+		return pq.length;
 	}
+	
+	public void associateIndex(T item, int index) {
+		// method meant to be overridden by indexed heap.
+	}
+	
+	public void associateIndex(T item, T from) {
+		// method meant to be overridden by indexed heap.
+	}
+	
+	public void assign(int to, int from) {
+		pq [to] = pq [from];
+	}
+	
+	public void assign(int to, T value) {
+		pq [to] = value;
+	}
+
 }
