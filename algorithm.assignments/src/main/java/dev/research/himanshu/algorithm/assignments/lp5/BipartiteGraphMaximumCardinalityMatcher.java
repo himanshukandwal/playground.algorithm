@@ -81,7 +81,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	public DebugLevel getDebuglevel() {
 		return debuglevel;
 	}
-	
+		
 	/**
 	 * function to perform maximum cardinality matching in a given bipartite graph.
 	 * 
@@ -98,26 +98,22 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 				List<Future<Pair>> futures = getThreadTasksMaster().invokeAll(getOuterLayerNodesWorkers());
 			
 				// maximum cardinal path.
-				List<Edge> maximalMatchingSeries = (isStoreResults() ? new LinkedList<Edge>() : null);
+				List<Edge> maximalMatchingSeries = (debuglevel.isVerboseEnabled() ? new LinkedList<Edge>() : null);
 				
 				// loop  through the futures and wait for result to appear and process for maximum cardinality.
 				for (Future<Pair> future : futures) {
 					if (debuglevel.isErrorEnabled())
-						System.out.println(" --> [" + future.get().getLength() + "] ");
+						System.out.println(" --> [ " + future.get().getLength() + " ] ");
 
-					if (isStoreResults()) 
-						maximalMatchingSeries.addAll(future.get().getEdges());
-					
 					// store the result.
 					result += future.get().getLength();
 				}
-								
+				
 				// print the maximum cardinality achievable.
 				System.out.println(result);
 				
-				if (isStoreResults()) {
-
-					// print the edges, if the 'debuglevel' has been set to VERBOSE.
+				// print the edges, if the 'debuglevel' has been set to VERBOSE.
+				if (getDebuglevel().isVerboseEnabled()) {
 					for (Edge edge : maximalMatchingSeries)
 						System.out.println(edge);
 				}
@@ -135,10 +131,6 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		return result;
 	}
 	
-	private boolean isStoreResults() {
-		return debuglevel.isVerboseEnabled();
-	}
-
 	/**
 	 * method to perform all the core validations requisite for the maximal matching to happen.
 	 * 
@@ -195,7 +187,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 					break;
 				}
 				
-				getOuterLayerNodesWorkers().add (new MaximalMatchingWorker(vertex, hiddenComponentsCount, isStoreResults()));
+				getOuterLayerNodesWorkers().add (new MaximalMatchingWorker(vertex, hiddenComponentsCount, debuglevel.isVerboseEnabled()));
 			}
 		}
 		
@@ -266,21 +258,20 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		/* total number of vertices present in this cluster (sub-graph) */
 		private final int hiddenComponentsCount;
 		
-		/* the best possible matching present for the sub-graph (starting with vertex) s*/
-		private List<Edge> maxEdges;		
+		/* the best possible matching present for the sub-graph (starting with vertex) */
+		private List<Edge> maxEdges;	
 		
-		/* flag to indicate whether we have to store results or not. */
-		private boolean storeResults;
+		private boolean store;
 		
 		/**
 		 * constructor.
 		 * 
 		 * @param vertex
 		 */
-		public MaximalMatchingWorker(Vertex vertex, int hiddenComponentsCount, boolean storeResults) {
-			this.storeResults = storeResults;
+		public MaximalMatchingWorker(Vertex vertex, int hiddenComponentsCount, boolean store) {
 			this.sourceVertex = vertex;
 			this.hiddenComponentsCount = hiddenComponentsCount;
+			this.store = store;
 		}
 		
 		/**
@@ -301,7 +292,6 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		@Override
 		public Pair call() throws Exception {
 			sourceVertex.parent = sourceVertex;
-			
 			return detectLargestCardinalEdge(sourceVertex, 0);
 		}
 		
@@ -314,9 +304,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 			/* place-holder for max-length and max-edges */
 			Pair innerResult = null;
 			
-			for (int idx = 0; idx < vertex.Adj.size(); idx ++) {
-				Edge edge = vertex.Adj.get(idx);
-				
+			for (Edge edge : vertex.Adj) {
 				Vertex otherVertex = edge.otherEnd(vertex);
 				
 				if (otherVertex.parent == null) {
@@ -325,16 +313,17 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 					// recurse.
 					innerResult = detectLargestCardinalEdge (otherVertex, (otherVertex.layer.isInner() ? seenCount + 1 : seenCount));
 					
-					// break recursion if full coverage has been reached. (perfect matching case), else clean-up for other possible scenario.
-					if (innerResult.isCoverageComplete()) {
-						if (vertex.layer.isOuter()) {
-							innerResult.length = innerResult.getLength() + 1;
-							
-							if (storeResults)
-								innerResult.getEdges().add(edge);
-						}
-						break;											
-					} else
+					if (vertex.layer.isOuter()) {
+						innerResult.length = innerResult.getLength() + 1;
+						
+						if (store) 
+							innerResult.getEdges().add(edge);
+					}
+					
+					// update best Pair.
+					if (innerResult.isCoverageComplete()) 
+						break;
+					else 
 						otherVertex.parent = null;
 				}
 			}
@@ -345,6 +334,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		public boolean isNull (Object object) {
 			return object == null;
 		}
+		
 	}
 	
 	/**
