@@ -81,7 +81,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	public DebugLevel getDebuglevel() {
 		return debuglevel;
 	}
-		
+	
 	/**
 	 * function to perform maximum cardinality matching in a given bipartite graph.
 	 * 
@@ -95,26 +95,27 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 			
 			try {
 				// triggering concurrent executions and holding on the futures (outcomes)
-				List<Future<List<Edge>>> futures = getThreadTasksMaster().invokeAll(getOuterLayerNodesWorkers());
+				List<Future<Pair>> futures = getThreadTasksMaster().invokeAll(getOuterLayerNodesWorkers());
 			
 				// maximum cardinal path.
-				List<Edge> maximalMatchingSeries = new LinkedList<>();
+				List<Edge> maximalMatchingSeries = (isStoreResults() ? new LinkedList<Edge>() : null);
 				
 				// loop  through the futures and wait for result to appear and process for maximum cardinality.
-				for (Future<List<Edge>> future : futures) {
+				for (Future<Pair> future : futures) {
 					if (debuglevel.isErrorEnabled())
-						System.out.println(" --> [" + future.get().size() + "] " + future.get());
+						System.out.println(" --> [" + future.get().getLength() + "] ");
 
-					maximalMatchingSeries.addAll(future.get());
+					if (isStoreResults()) 
+						maximalMatchingSeries.addAll(future.get().getEdges());
+					
+					// store the result.
+					result += future.get().getLength();
 				}
-				
-				// store the result.
-				result = maximalMatchingSeries.size();
-				
+								
 				// print the maximum cardinality achievable.
 				System.out.println(result);
 				
-				if (getDebuglevel().isVerboseEnabled()) {
+				if (isStoreResults()) {
 
 					// print the edges, if the 'debuglevel' has been set to VERBOSE.
 					for (Edge edge : maximalMatchingSeries)
@@ -134,6 +135,10 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		return result;
 	}
 	
+	private boolean isStoreResults() {
+		return debuglevel.isVerboseEnabled();
+	}
+
 	/**
 	 * method to perform all the core validations requisite for the maximal matching to happen.
 	 * 
@@ -183,14 +188,14 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 				vertex.layer = Layer.OUTER;
 				processingQueue.add(vertex);
 				
-				Integer clusterCount = bipartiteBfsCheckingInternal(processingQueue);
+				Integer hiddenComponentsCount = bipartiteBfsCheckingInternal(processingQueue);
 				
-				if (clusterCount == null) {
+				if (hiddenComponentsCount == null) {
 					result = false;
 					break;
 				}
 				
-				getOuterLayerNodesWorkers().add(new MaximalMatchingWorker(vertex, clusterCount));
+				getOuterLayerNodesWorkers().add (new MaximalMatchingWorker(vertex, hiddenComponentsCount, isStoreResults()));
 			}
 		}
 		
@@ -200,10 +205,12 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	private Integer bipartiteBfsCheckingInternal(Queue<Vertex> processingQueue) {
 		boolean result = true;
 		
-		int componentCount = 0;
+		int hiddenComponentsCount = 0;
 		while (!processingQueue.isEmpty()) {
 			Vertex vertex = processingQueue.poll();
-			componentCount ++;
+			
+			if (vertex.layer.isInner())
+				hiddenComponentsCount ++;
 			
 			for (Edge edge : vertex.Adj) {
 				if (!edge.seen) {
@@ -243,7 +250,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		
 		// removing the holds (pointers), GC considerations !
 		processingQueue.clear();
-		return (result ? componentCount : null);
+		return (result ? hiddenComponentsCount : null);
 	}
 	
 	/**
@@ -251,26 +258,29 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	 * 
 	 * @author G31 (Himanshu Kandwal and Dharmam Buch)
 	 */
-	public static class MaximalMatchingWorker implements Callable<List<Edge>> {
+	public static class MaximalMatchingWorker implements Callable<Pair> {
 		
 		/* the main source vertex from which matching will be initiated. */
 		private final Vertex sourceVertex;
 		
 		/* total number of vertices present in this cluster (sub-graph) */
-		private final int clusterCount;
+		private final int hiddenComponentsCount;
 		
 		/* the best possible matching present for the sub-graph (starting with vertex) s*/
-		private List<Edge> maxEdges;			 
+		private List<Edge> maxEdges;		
+		
+		/* flag to indicate whether we have to store results or not. */
+		private boolean storeResults;
 		
 		/**
 		 * constructor.
 		 * 
 		 * @param vertex
 		 */
-		public MaximalMatchingWorker(Vertex vertex, int clusterCount) {
-			System.out.println(" created worker for : " + vertex + " with cluster count : " + clusterCount);
+		public MaximalMatchingWorker(Vertex vertex, int hiddenComponentsCount, boolean storeResults) {
+			this.storeResults = storeResults;
 			this.sourceVertex = vertex;
-			this.clusterCount = clusterCount;
+			this.hiddenComponentsCount = hiddenComponentsCount;
 		}
 		
 		/**
@@ -289,95 +299,93 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		 * overridden call method (similar to 'run' method)
 		 */
 		@Override
-		public List<Edge> call() throws Exception {
+		public Pair call() throws Exception {
 			sourceVertex.parent = sourceVertex;
-			return detectLargestCardinalEdge(sourceVertex, 1).getEdges();
+			
+			return detectLargestCardinalEdge(sourceVertex, 0);
 		}
 		
 		public Pair detectLargestCardinalEdge (Vertex vertex, int seenCount) {	
-			boolean coverageComplete = (seenCount == clusterCount);
+			boolean coverageComplete = (seenCount == hiddenComponentsCount);
 			
 			if (coverageComplete)
 				return Pair.pairOf (null, 0, coverageComplete);
 			
 			/* place-holder for max-length and max-edges */
-			Pair bestPair = null;
+			Pair innerResult = null;
 			
-			for (Edge edge : vertex.Adj) {
+			for (int idx = 0; idx < vertex.Adj.size(); idx ++) {
+				Edge edge = vertex.Adj.get(idx);
+				
 				Vertex otherVertex = edge.otherEnd(vertex);
 				
 				if (otherVertex.parent == null) {
 					otherVertex.parent = vertex;
 					
 					// recurse.
-					Pair innerResult = detectLargestCardinalEdge (otherVertex, seenCount + 1);
-					
-					// update best Pair.
-					if (bestPair == null || (innerResult.getLength() + 1 > bestPair.getLength())) {
-						bestPair = innerResult;
-						
-						// manage cardinality.
-						if (vertex.layer.isOuter()) {
-							bestPair.length = innerResult.getLength() + 1;
-							bestPair.getEdges().add(edge);
-						}
-					}
+					innerResult = detectLargestCardinalEdge (otherVertex, (otherVertex.layer.isInner() ? seenCount + 1 : seenCount));
 					
 					// break recursion if full coverage has been reached. (perfect matching case), else clean-up for other possible scenario.
-					if (bestPair.isCoverageComplete())
+					if (innerResult.isCoverageComplete()) {
+						if (vertex.layer.isOuter()) {
+							innerResult.length = innerResult.getLength() + 1;
+							
+							if (storeResults)
+								innerResult.getEdges().add(edge);
+						}
 						break;											
-					else
+					} else
 						otherVertex.parent = null;
 				}
 			}
 			
-			return (isNull(bestPair) ? Pair.pairOf (null, 0, coverageComplete) : bestPair);
+			return (isNull(innerResult) ? Pair.pairOf (null, 0, coverageComplete) : innerResult);
 		}
 		
 		public boolean isNull (Object object) {
 			return object == null;
 		}
+	}
+	
+	/**
+	 * a container class to store temporal result.
+	 *
+	 */
+	public static class Pair {
+	
+		private List<Edge> edges;
+		private Integer length;
+		private boolean coverageComplete;
 		
-		/**
-		 * a container class to store temporal result.
-		 *
-		 */
-		public static class Pair {
-		
-			private List<Edge> edges;
-			private Integer length;
-			private boolean coverageComplete;
-			
-			private Pair(List<Edge> edges, Integer length) {
-				this.length = length;
-				this.edges = edges;
-			}
-			
-			private Pair(List<Edge> edges, Integer length, boolean coverageComplete) {
-				this(edges, length);
-				this.coverageComplete = coverageComplete;
-			}
-			
-			public static Pair pairOf(List<Edge> edge, Integer length, boolean coverageComplete) {
-				return new Pair(edge, length, coverageComplete);
-			}
-			
-			public List<Edge> getEdges() {
-				if (edges == null)
-					edges = new LinkedList<>();
-				
-				return edges;
-			}
-			
-			public Integer getLength() {
-				return length;
-			}
-			
-			public boolean isCoverageComplete() {
-				return coverageComplete;
-			}
-			
+		private Pair(List<Edge> edges, Integer length) {
+			this.length = length;
+			this.edges = edges;
 		}
+		
+		private Pair(List<Edge> edges, Integer length, boolean coverageComplete) {
+			this(edges, length);
+			this.coverageComplete = coverageComplete;
+		}
+		
+		public static Pair pairOf(List<Edge> edge, Integer length, boolean coverageComplete) {
+			return new Pair(edge, length, coverageComplete);
+		}
+		
+		public List<Edge> getEdges() {
+			if (edges == null)
+				edges = new LinkedList<>();
+			
+			return edges;
+		}
+		
+		public Integer getLength() {
+			return length;
+		}
+		
+		public boolean isCoverageComplete() {
+			return coverageComplete;
+		}
+		
 	}
 
 }
