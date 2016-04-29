@@ -2,13 +2,9 @@ package dev.research.himanshu.algorithm.assignments.lp5;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 /**
@@ -17,23 +13,30 @@ import java.util.concurrent.Future;
  * @author G31 (Himanshu Kandwal and Dharmam Buch)
  *
  */
-public class BipartiteGraphMaximumCardinalityMatcher {
+public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMatcher {
 	
-	private static BipartiteGraphMaximumCardinalityMatcher instance;				// singleton instance.
-	private Graph graph;															// inner graph.
-	private ExecutorService threadTasksMaster = Executors.newFixedThreadPool(10); 	// executor service : acting as a managed thread-pool agent.
-	private List<MaximalMatchingWorker> freeOuterLayerNodesQueue;					// queue of matchings of free outer nodes.
-	
-	/* concurrentHashMap is implemented for higher throughput, for case where high concurrency is expected. */
-	private ConcurrentHashMap<Integer, Matching> idMatchingMap;		
+	private DebugLevel debuglevel;											// Debug level.
+	private List<MaximalMatchingWorker> outerLayerNodesWorkers;				// List of matchings-workers for free outer nodes.
 	
 	/**
 	 * private constructor.
 	 * 
 	 * @param graph
 	 */
-	private BipartiteGraphMaximumCardinalityMatcher(Graph graph) {
-		this.graph = graph;
+	private BipartiteGraphMaximumCardinalityMatcher(Graph graph, DebugLevel debugLevel) {
+		super(graph);
+		this.debuglevel = debugLevel;
+	}
+	
+	/**
+	 * static getter method for the singleton instance.  
+	 *  
+	 * @param graph
+	 * @return
+	 */
+	public static BipartiteGraphMaximumCardinalityMatcher getInstance(Graph graph, DebugLevel debugLevel) {
+		BipartiteGraphMaximumCardinalityMatcher instance = new BipartiteGraphMaximumCardinalityMatcher(graph, debugLevel);
+		return instance.setGraph(graph);
 	}
 	
 	/**
@@ -43,18 +46,8 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 	 * @return
 	 */
 	public static BipartiteGraphMaximumCardinalityMatcher getInstance(Graph graph) {
-		if (instance == null)
-			instance = new BipartiteGraphMaximumCardinalityMatcher(graph);
+		BipartiteGraphMaximumCardinalityMatcher instance = new BipartiteGraphMaximumCardinalityMatcher(graph, DebugLevel.MINIMAL);
 		return instance.setGraph(graph);
-	}
-	
-	/**
-	 * getter method for inner graph.
-	 * 
-	 * @return
-	 */
-	public Graph getGraph() {
-		return graph;
 	}
 	
 	/**
@@ -64,16 +57,8 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 	 * @return
 	 */
 	public BipartiteGraphMaximumCardinalityMatcher setGraph(Graph graph) {
-		this.graph = graph;
+		super.graph = graph;
 		return this;
-	}
-	
-	/**
-	 * getter method for managed thread-pool 'threadTasksMaster'.
-	 * @return
-	 */
-	public ExecutorService getThreadTasksMaster() {
-		return threadTasksMaster;
 	}
 	
 	/**
@@ -81,54 +66,62 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 	 * 
 	 * @return
 	 */
-	public List<MaximalMatchingWorker> getFreeOuterLayerNodesQueue() {
-		if (freeOuterLayerNodesQueue == null)
-			freeOuterLayerNodesQueue = new LinkedList<MaximalMatchingWorker>();
+	public List<MaximalMatchingWorker> getOuterLayerNodesWorkers() {
+		if (outerLayerNodesWorkers == null)
+			outerLayerNodesWorkers = new LinkedList<MaximalMatchingWorker>();
 		
-		return freeOuterLayerNodesQueue;
+		return outerLayerNodesWorkers;
 	}
 	
 	/**
-	 * getter method for map 'idMatchingMap'.
+	 * getter method for the enum 'debugLevel'
 	 * 
 	 * @return
 	 */
-	public ConcurrentHashMap<Integer, Matching> getIdMatchingMap() {
-		if (idMatchingMap == null) 
-			idMatchingMap = new ConcurrentHashMap<>();
-		
-		return idMatchingMap;
+	public DebugLevel getDebuglevel() {
+		return debuglevel;
 	}
-	
+		
 	/**
 	 * function to perform maximum cardinality matching in a given bipartite graph.
 	 * 
 	 * @return
 	 */
-	public int performMaximumMatching() {
+	public Integer performMaximumMatching() {
 		int result = 0;
 		
 		//since all the basic bipartite conditions are met, then proceed with the matching.
 		if (validateGraph()) {
+			
 			try {
-				// triggering concurrent executions.
-				List<Future<Void>>	futures = getThreadTasksMaster().invokeAll(getFreeOuterLayerNodesQueue());
+				// triggering concurrent executions and holding on the futures (outcomes)
+				List<Future<List<Edge>>> futures = getThreadTasksMaster().invokeAll(getOuterLayerNodesWorkers());
+			
+				// maximum cardinal path.
+				List<Edge> maximalMatchingSeries = new LinkedList<>();
 				
-				for (Future<Void> future : futures)
-					future.get();										// wait for all processes to finish.
-				
-				// find maximum weight and return result.
-				Matching maximalMatching = null;
-				
-				for (Map.Entry<Integer, Matching> idMatchingEntry : getIdMatchingMap().entrySet()) {
-					if (maximalMatching == null || (maximalMatching != null && idMatchingEntry.getValue().getWeight() > maximalMatching.getWeight()))
-						maximalMatching = idMatchingEntry.getValue();
+				// loop  through the futures and wait for result to appear and process for maximum cardinality.
+				for (Future<List<Edge>> future : futures) {
+					if (debuglevel.isErrorEnabled())
+						System.out.println(" --> [" + future.get().size() + "] " + future.get());
+
+					maximalMatchingSeries.addAll(future.get());
 				}
 				
-				// print the maximal matching.
-				maximalMatching.print();
+				// store the result.
+				result = maximalMatchingSeries.size();
 				
-				return (maximalMatching != null ? maximalMatching.getWeight() : result);
+				// print the maximum cardinality achievable.
+				System.out.println(result);
+				
+				if (getDebuglevel().isVerboseEnabled()) {
+
+					// print the edges, if the 'debuglevel' has been set to VERBOSE.
+					for (Edge edge : maximalMatchingSeries)
+						System.out.println(edge);
+				}
+				
+				return result;
 			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
@@ -158,13 +151,12 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 				vertex.seen = false;
 				
 				if (vertex.layer == null)
-					result = false;								// disconnected graph. 
+					result = false;																	// disconnected graph. 
 				else {
 					if (vertex.layer.isInner()) {
-						innerLayerNodes ++;						// count inner-layer nodes.
+						innerLayerNodes ++;															// count inner-layer nodes.
 					} else {
-						outerLayerNodes ++;						// count outer-layer nodes.
-						getFreeOuterLayerNodesQueue().add(new MaximalMatchingWorker(vertex));
+						outerLayerNodes ++;															// count outer-layer nodes.
 					}
 				}
 			}
@@ -182,18 +174,36 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 	 * @return
 	 */
 	private boolean bipartiteBfsChecking() {
+		Queue<Vertex> processingQueue = new LinkedList<>();
 		boolean result = true;
 		
-		Queue<Vertex> processingQueue = new LinkedList<>();
-		
-		Vertex vertex = getGraph().verts.get(1);
-		vertex.seen = true;
-		vertex.layer = Layer.OUTER;
-		processingQueue.add(vertex);
+		for (Vertex vertex : getGraph()) {
+			if (!vertex.seen) {
+				vertex.seen = true;
+				vertex.layer = Layer.OUTER;
+				processingQueue.add(vertex);
 				
+				Integer clusterCount = bipartiteBfsCheckingInternal(processingQueue);
+				
+				if (clusterCount == null) {
+					result = false;
+					break;
+				}
+				
+				getOuterLayerNodesWorkers().add(new MaximalMatchingWorker(vertex, clusterCount));
+			}
+		}
+		
+		return result;
+	}
+	
+	private Integer bipartiteBfsCheckingInternal(Queue<Vertex> processingQueue) {
+		boolean result = true;
+		
+		int componentCount = 0;
 		while (!processingQueue.isEmpty()) {
-			vertex = processingQueue.poll();
-			vertex.sortEdges();
+			Vertex vertex = processingQueue.poll();
+			componentCount ++;
 			
 			for (Edge edge : vertex.Adj) {
 				if (!edge.seen) {
@@ -206,15 +216,23 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 						processingQueue.add(otherVertex);
 					} else {
 						// else check if the existing layer is in accordance or not.
-						if (otherVertex.layer == vertex.layer)
+						if (otherVertex.layer == vertex.layer) {
+							if (getDebuglevel().isErrorEnabled())
+								System.out.println(otherVertex + " and " + vertex + " are on same layer : " + otherVertex.layer);
+							
 							result = false;
+						}
 					}
 					
 					edge.seen = true;
 				} else {
 					// if the edge is seen, check the other side vertex (not necessary, however precautionary)
-					if (!edge.isBipartiteCompatible())
-						result = false;
+					if (!edge.isBipartiteCompatible()) {
+						if (getDebuglevel().isErrorEnabled())
+							System.out.println(edge + " is not bipartite compatible");
+						
+						result = false;					
+					}
 				}
 				
 				// if found failure, break out !
@@ -225,7 +243,7 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 		
 		// removing the holds (pointers), GC considerations !
 		processingQueue.clear();
-		return result;
+		return (result ? componentCount : null);
 	}
 	
 	/**
@@ -233,81 +251,132 @@ public class BipartiteGraphMaximumCardinalityMatcher {
 	 * 
 	 * @author G31 (Himanshu Kandwal and Dharmam Buch)
 	 */
-	private class MaximalMatchingWorker implements Callable<Void> {
+	public static class MaximalMatchingWorker implements Callable<List<Edge>> {
 		
-		private final Matching myMatching;
+		/* the main source vertex from which matching will be initiated. */
+		private final Vertex sourceVertex;
 		
-		public MaximalMatchingWorker(Vertex vertex) {
-			this.myMatching = new Matching(vertex);
-			
-			// register matching.
-			getIdMatchingMap().put(vertex.name, myMatching);
+		/* total number of vertices present in this cluster (sub-graph) */
+		private final int clusterCount;
+		
+		/* the best possible matching present for the sub-graph (starting with vertex) s*/
+		private List<Edge> maxEdges;			 
+		
+		/**
+		 * constructor.
+		 * 
+		 * @param vertex
+		 */
+		public MaximalMatchingWorker(Vertex vertex, int clusterCount) {
+			System.out.println(" created worker for : " + vertex + " with cluster count : " + clusterCount);
+			this.sourceVertex = vertex;
+			this.clusterCount = clusterCount;
 		}
 		
-		@Override
-		public Void call() throws Exception {
-			Vertex vertex = myMatching.getTailNode();
-			boolean matchDetected = true;
-			Matching mergableMatching = null;
+		/**
+		 * getter for 'maxEdges'
+		 * 
+		 * @return
+		 */
+		public List<Edge> getMaxEdges() {
+			if (maxEdges == null) 
+				maxEdges = new LinkedList<>();
 			
-			/* build matching, with all possibilities. */
-			while (matchDetected) {
-				matchDetected = false;
-				Edge maximalWeightedUnseenVertexEdge = null;
-				
-				for (Edge edge : myMatching.getTailNode().Adj) {
-					Vertex otherVertex = edge.otherEnd(vertex);
-					
-					// case : found vertex (outer) which is used in matching somewhere else.
-					if (getIdMatchingMap().containsKey(otherVertex.name)) {
-						mergableMatching = getIdMatchingMap().remove(otherVertex.name); 		// unregister the matching for future merging.
-						
-						// System.out.println(myMatching.getId() + " waiting for : " + mergableMatching.getId());
-						while (mergableMatching.isActive()) { 
-							/* wait till the mergable matching is still building up. */ 
-						}
-					
-						// merge.
-						if (!mergableMatching.isActive())
-							matchDetected = myMatching.merge(mergableMatching);
-						
-						break;
-					} 
-					// case : found vertex (outer) which is not yet used in matching.
-					else {
-						if (otherVertex.parent == null && maximalWeightedUnseenVertexEdge == null) {	// as edges are sorted already for a vertex, so no other checks needed.							 
-							matchDetected = myMatching.addMate(otherVertex);
-							break;
-						}
-					}				
-				}
-			}
-
-			// check if there is any potential extension are possible.
-			mergableMatching = null;
-			for (Edge edge : myMatching.getTailNode().Adj) {
+			return maxEdges;
+		}
+		
+		/**
+		 * overridden call method (similar to 'run' method)
+		 */
+		@Override
+		public List<Edge> call() throws Exception {
+			sourceVertex.parent = sourceVertex;
+			return detectLargestCardinalEdge(sourceVertex, 1).getEdges();
+		}
+		
+		public Pair detectLargestCardinalEdge (Vertex vertex, int seenCount) {	
+			boolean coverageComplete = (seenCount == clusterCount);
+			
+			if (coverageComplete)
+				return Pair.pairOf (null, 0, coverageComplete);
+			
+			/* place-holder for max-length and max-edges */
+			Pair bestPair = null;
+			
+			for (Edge edge : vertex.Adj) {
 				Vertex otherVertex = edge.otherEnd(vertex);
 				
-				// note the next possible maximal matching.
-				if (getIdMatchingMap().containsKey(otherVertex.name) && !getIdMatchingMap().get(otherVertex.name).isActive()) {
-					if ((mergableMatching == null) ||  (mergableMatching != null
-							&& (getIdMatchingMap().get(otherVertex.name).getWeight() > mergableMatching.getWeight()))) {
+				if (otherVertex.parent == null) {
+					otherVertex.parent = vertex;
+					
+					// recurse.
+					Pair innerResult = detectLargestCardinalEdge (otherVertex, seenCount + 1);
+					
+					// update best Pair.
+					if (bestPair == null || (innerResult.getLength() + 1 > bestPair.getLength())) {
+						bestPair = innerResult;
 						
-						mergableMatching = getIdMatchingMap().get(otherVertex.name);
+						// manage cardinality.
+						if (vertex.layer.isOuter()) {
+							bestPair.length = innerResult.getLength() + 1;
+							bestPair.getEdges().add(edge);
+						}
 					}
+					
+					// break recursion if full coverage has been reached. (perfect matching case), else clean-up for other possible scenario.
+					if (bestPair.isCoverageComplete())
+						break;											
+					else
+						otherVertex.parent = null;
 				}
 			}
 			
-			if (mergableMatching != null) {
-				// unregister matching from idMatching map, so that no one else accesses it.
-				getIdMatchingMap().remove(mergableMatching.getId());
-				
-				// merge.
-				myMatching.merge(mergableMatching);
-			}
+			return (isNull(bestPair) ? Pair.pairOf (null, 0, coverageComplete) : bestPair);
+		}
 		
-			myMatching.setActive(false); 				// match building not active anymore, available for merging.
-			return null;
+		public boolean isNull (Object object) {
+			return object == null;
+		}
+		
+		/**
+		 * a container class to store temporal result.
+		 *
+		 */
+		public static class Pair {
+		
+			private List<Edge> edges;
+			private Integer length;
+			private boolean coverageComplete;
+			
+			private Pair(List<Edge> edges, Integer length) {
+				this.length = length;
+				this.edges = edges;
+			}
+			
+			private Pair(List<Edge> edges, Integer length, boolean coverageComplete) {
+				this(edges, length);
+				this.coverageComplete = coverageComplete;
+			}
+			
+			public static Pair pairOf(List<Edge> edge, Integer length, boolean coverageComplete) {
+				return new Pair(edge, length, coverageComplete);
+			}
+			
+			public List<Edge> getEdges() {
+				if (edges == null)
+					edges = new LinkedList<>();
+				
+				return edges;
+			}
+			
+			public Integer getLength() {
+				return length;
+			}
+			
+			public boolean isCoverageComplete() {
+				return coverageComplete;
+			}
+			
 		}
 	}
 
