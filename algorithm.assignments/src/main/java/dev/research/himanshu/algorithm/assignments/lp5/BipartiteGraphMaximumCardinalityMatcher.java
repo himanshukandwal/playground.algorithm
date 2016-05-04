@@ -1,11 +1,7 @@
 package dev.research.himanshu.algorithm.assignments.lp5;
 
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 /**
  * A class to implement validation checks and maximum cardinality matching logic, for bipartite graph.
@@ -15,8 +11,11 @@ import java.util.concurrent.Future;
  */
 public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMatcher {
 	
-	private DebugLevel debuglevel;											// Debug level.
-	private List<MaximalMatchingWorker> outerLayerNodesWorkers;				// List of matchings-workers for free outer nodes.
+	/* debug level */
+	private DebugLevel debuglevel;											
+	
+	/* cardinality */
+	private int length;
 	
 	/**
 	 * private constructor.
@@ -62,18 +61,6 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	}
 	
 	/**
-	 * getter method for queue 'freeOuterLayerNodesQueue'.
-	 * 
-	 * @return
-	 */
-	public List<MaximalMatchingWorker> getOuterLayerNodesWorkers() {
-		if (outerLayerNodesWorkers == null)
-			outerLayerNodesWorkers = new LinkedList<MaximalMatchingWorker>();
-		
-		return outerLayerNodesWorkers;
-	}
-	
-	/**
 	 * getter method for the enum 'debugLevel'
 	 * 
 	 * @return
@@ -88,39 +75,43 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 	 * @return
 	 */
 	public Integer performMaximumMatching() {
-		int result = 0;
 		
 		//since all the basic bipartite conditions are met, then proceed with the matching.
 		if (validateGraph()) {
 			
-			try {
-				// triggering concurrent executions and holding on the futures (outcomes)
-				List<Future<Pair>> futures = getThreadTasksMaster().invokeAll(getOuterLayerNodesWorkers());
+			for (Vertex vertex : graph) {
+				for (Edge edge : vertex.Adj) {
+					
+					if (!edge.seen) {
+						edge.seen = true;
+								
+						Vertex otherVertex = edge.otherEnd(vertex);
+	
+						if (otherVertex.mate == null && vertex.mate == null) {
+							otherVertex.mate = vertex;
+							vertex.mate = otherVertex;
+	
+							length++;
+						}
+					}
+				}
+			}
 			
-				// maximum cardinal path.
-				List<Edge> maximalMatchingSeries = (debuglevel.isVerboseEnabled() ? new LinkedList<Edge>() : null);
-				
-				// loop  through the futures and wait for result to appear and process for maximum cardinality.
-				for (Future<Pair> future : futures) {
-					if (debuglevel.isErrorEnabled())
-						System.out.println(" --> [ " + future.get().getLength() + " ] ");
-
-					// store the result.
-					result += future.get().getLength();
+			// call main method
+			detectMaximalMatching();
+			
+			// print the maximum cardinality achievable.
+			System.out.println(length);
+			
+			// print the edges, if the 'debuglevel' has been set to VERBOSE.
+			if (getDebuglevel().isVerboseEnabled()) {
+				for (Vertex vertex : getGraph()) {
+					if (vertex.mate != null && vertex.seen) {
+						System.out.println(vertex + " " + vertex.mate);
+						vertex.seen = false;
+						vertex.mate.seen = false;
+					}
 				}
-				
-				// print the maximum cardinality achievable.
-				System.out.println(result);
-				
-				// print the edges, if the 'debuglevel' has been set to VERBOSE.
-				if (getDebuglevel().isVerboseEnabled()) {
-					for (Edge edge : maximalMatchingSeries)
-						System.out.println(edge);
-				}
-				
-				return result;
-			} catch (InterruptedException | ExecutionException e) {
-				e.printStackTrace();
 			}
 			
 		} else {
@@ -128,7 +119,7 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 			System.exit(1);
 		}
 		
-		return result;
+		return length;
 	}
 	
 	/**
@@ -175,34 +166,27 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		boolean result = true;
 		
 		for (Vertex vertex : getGraph()) {
+			
 			if (!vertex.seen) {
 				vertex.seen = true;
 				vertex.layer = Layer.OUTER;
 				processingQueue.add(vertex);
 				
-				Integer hiddenComponentsCount = bipartiteBfsCheckingInternal(processingQueue);
+				result = bipartiteBfsCheckingInternal(processingQueue, vertex.name);
 				
-				if (hiddenComponentsCount == null) {
-					result = false;
+				if (!result)
 					break;
-				}
-				
-				getOuterLayerNodesWorkers().add (new MaximalMatchingWorker(vertex, hiddenComponentsCount, debuglevel.isVerboseEnabled()));
 			}
 		}
 		
 		return result;
 	}
 	
-	private Integer bipartiteBfsCheckingInternal(Queue<Vertex> processingQueue) {
+	private boolean bipartiteBfsCheckingInternal (Queue<Vertex> processingQueue, int rank) {
 		boolean result = true;
 		
-		int hiddenComponentsCount = 0;
 		while (!processingQueue.isEmpty()) {
 			Vertex vertex = processingQueue.poll();
-			
-			if (vertex.layer.isInner())
-				hiddenComponentsCount ++;
 			
 			for (Edge edge : vertex.Adj) {
 				if (!edge.seen) {
@@ -242,140 +226,106 @@ public class BipartiteGraphMaximumCardinalityMatcher extends AbstractBipartiteMa
 		
 		// removing the holds (pointers), GC considerations !
 		processingQueue.clear();
-		return (result ? hiddenComponentsCount : null);
+		return result;
 	}
-	
+
 	/**
-	 * an inner class (Worker thread), implementing logic of maximal matching.  
+	 * main method to detect the maximal matching in the graph.
 	 * 
-	 * @author G31 (Himanshu Kandwal and Dharmam Buch)
 	 */
-	public static class MaximalMatchingWorker implements Callable<Pair> {
-		
-		/* the main source vertex from which matching will be initiated. */
-		private final Vertex sourceVertex;
-		
-		/* total number of vertices present in this cluster (sub-graph) */
-		private final int hiddenComponentsCount;
-		
-		/* the best possible matching present for the sub-graph (starting with vertex) */
-		private List<Edge> maxEdges;	
-		
-		private boolean store;
-		
-		/**
-		 * constructor.
-		 * 
-		 * @param vertex
-		 */
-		public MaximalMatchingWorker(Vertex vertex, int hiddenComponentsCount, boolean store) {
-			this.sourceVertex = vertex;
-			this.hiddenComponentsCount = hiddenComponentsCount;
-			this.store = store;
-		}
-		
-		/**
-		 * getter for 'maxEdges'
-		 * 
-		 * @return
-		 */
-		public List<Edge> getMaxEdges() {
-			if (maxEdges == null) 
-				maxEdges = new LinkedList<>();
+	public void detectMaximalMatching () {
 			
-			return maxEdges;
-		}
-		
-		/**
-		 * overridden call method (similar to 'run' method)
-		 */
-		@Override
-		public Pair call() throws Exception {
-			sourceVertex.parent = sourceVertex;
-			return detectLargestCardinalEdge(sourceVertex, 0);
-		}
-		
-		public Pair detectLargestCardinalEdge (Vertex vertex, int seenCount) {	
-			boolean coverageComplete = (seenCount == hiddenComponentsCount);
+		while (true) {
+			Queue<Vertex> processingOuterNodesQueue = new LinkedList<>();
 			
-			if (coverageComplete)
-				return Pair.pairOf (null, 0, coverageComplete);
-			
-			/* place-holder for max-length and max-edges */
-			Pair innerResult = null;
-			
-			for (Edge edge : vertex.Adj) {
-				Vertex otherVertex = edge.otherEnd(vertex);
+			for (Vertex u : graph) {
+				u.parent = null;
+				u.seen = false;
+				u.isFrozen = false;
 				
-				if (otherVertex.parent == null) {
-					otherVertex.parent = vertex;
-					
-					// recurse.
-					innerResult = detectLargestCardinalEdge (otherVertex, (otherVertex.layer.isInner() ? seenCount + 1 : seenCount));
-					
-					if (vertex.layer.isOuter()) {
-						innerResult.length = innerResult.getLength() + 1;
-						
-						if (store) 
-							innerResult.getEdges().add(edge);
-					}
-					
-					// update best Pair.
-					if (innerResult.isCoverageComplete()) 
-						break;
-					else 
-						otherVertex.parent = null;
+				if (u.mate == null && u.layer.isOuter()) {
+					u.seen = true;
+					processingOuterNodesQueue.add(u);
 				}
 			}
 			
-			return (isNull(innerResult) ? Pair.pairOf (null, 0, coverageComplete) : innerResult);
-		}
-		
-		public boolean isNull (Object object) {
-			return object == null;
-		}
-		
-	}
-	
-	/**
-	 * a container class to store temporal result.
-	 *
-	 */
-	public static class Pair {
-	
-		private List<Edge> edges;
-		private Integer length;
-		private boolean coverageComplete;
-		
-		private Pair(List<Edge> edges, Integer length) {
-			this.length = length;
-			this.edges = edges;
-		}
-		
-		private Pair(List<Edge> edges, Integer length, boolean coverageComplete) {
-			this(edges, length);
-			this.coverageComplete = coverageComplete;
-		}
-		
-		public static Pair pairOf(List<Edge> edge, Integer length, boolean coverageComplete) {
-			return new Pair(edge, length, coverageComplete);
-		}
-		
-		public List<Edge> getEdges() {
-			if (edges == null)
-				edges = new LinkedList<>();
+			boolean toExpand = false;
 			
-			return edges;
+			while (!processingOuterNodesQueue.isEmpty()) {
+				Vertex u = processingOuterNodesQueue.poll();
+				
+				for (Edge edge : u.Adj) {
+					Vertex v = edge.otherEnd(u);
+					
+					if (!v.seen) {
+						v.parent = u;
+						v.seen = true;
+						
+						// augmenting path has been found.
+						if (v.mate == null) {
+							u.seen = true;
+							
+							processAugmentingPath (v);
+							toExpand = true;
+						} 
+						else {
+							Vertex x = v.mate;
+							x.seen = true;
+							x.parent = v;
+							
+							processingOuterNodesQueue.add (x);
+						}
+					}
+				}
+			}
+			
+			if (!toExpand)
+				break;
 		}
-		
-		public Integer getLength() {
-			return length;
-		}
-		
-		public boolean isCoverageComplete() {
-			return coverageComplete;
-		}
-		
 	}
-
+	
+	/*
+	 * Helper function to increase size of matching, using an augmenting path. 
+	 */
+	private void processAugmentingPath(Vertex u) {
+		boolean pathFrozen = false;
+		Vertex traversing = u;
+		
+		while (traversing != null) {
+			if ((pathFrozen = traversing.isFrozen))
+				break;
+			
+			traversing = traversing.parent;
+		}
+		
+		if (pathFrozen)
+			return;
+			
+		Vertex p = u.parent;
+		Vertex x = p.parent;
+		
+		u.isFrozen = true;
+		p.isFrozen = true;
+		
+		u.seen = true;
+		
+		u.mate = p;
+		p.mate = u;
+		
+		while (x != null) {
+			Vertex nmx = x.parent;
+			Vertex y = nmx.parent;
+			
+			x.mate = nmx;
+			nmx.mate = x;
+			
+			x.isFrozen = true;
+			nmx.isFrozen = true;
+			
+			x = y;
+		}
+		
+		length ++;
+	}
+		
 }
