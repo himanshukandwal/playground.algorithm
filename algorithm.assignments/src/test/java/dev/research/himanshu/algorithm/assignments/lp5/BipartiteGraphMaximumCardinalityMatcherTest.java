@@ -23,10 +23,45 @@ public class BipartiteGraphMaximumCardinalityMatcherTest {
 	@Test
 	public void testMaximalMatchingBasic() throws Exception {
 		
+		DebugLevel debugLevel = DebugLevel.VERBOSE;
+		
 		FileFilter matchingFileFilter = new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
 				if (pathname.getName().startsWith("test-case-") && pathname.getName().endsWith(".txt"))
+					return true;
+				
+				return false;
+			}
+		};
+		
+		for (File testFile : new File(testsDirectory).listFiles(matchingFileFilter)) {
+			
+			System.out.println(" working on file : " + testFile.getName());
+			
+			BufferedReader bufferedReader = new BufferedReader(new FileReader(testFile));
+			
+			String newline = null;
+			String prevLine = null;
+			
+			while ((newline = bufferedReader.readLine()) != null) { prevLine = newline; }
+			bufferedReader.close();
+			
+			assertEquals(Integer.valueOf(prevLine.split(" ")[0]), 
+					BipartiteGraphMaximumCardinalityMatcher.getInstance(Graph.readGraph(new Scanner(testFile), false), debugLevel).performMaximumMatching());
+		}
+		
+	}
+	
+	@Test
+	public void testMaximalMatchingComplex() throws Exception {
+		
+		DebugLevel debugLevel = DebugLevel.MINIMAL;
+		
+		FileFilter matchingFileFilter = new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if (pathname.getName().startsWith("bip") && pathname.getName().endsWith(".txt"))
 					return true;
 				return false;
 			}
@@ -45,35 +80,7 @@ public class BipartiteGraphMaximumCardinalityMatcherTest {
 			bufferedReader.close();
 			
 			assertEquals(Integer.valueOf(prevLine.split(" ")[0]), 
-					BipartiteGraphMaximumCardinalityMatcher.getInstance(Graph.readGraph(new Scanner(testFile), false), DebugLevel.ERROR).performMaximumMatching());
-		}
-		
-	}
-	
-	@Test
-	public void testMaximalMatchingComplex() throws Exception {
-		
-		FileFilter matchingFileFilter = new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.getName().startsWith("bip") && pathname.getName().endsWith(".txt"))
-					return true;
-				return false;
-			}
-		};
-		
-		for (File testFile : new File(testsDirectory).listFiles(matchingFileFilter)) {
-			
-			BufferedReader bufferedReader = new BufferedReader(new FileReader(testFile));
-			
-			String newline = null;
-			String prevLine = null;
-			
-			while ((newline = bufferedReader.readLine()) != null) { prevLine = newline; }
-			bufferedReader.close();
-			
-			assertEquals(Integer.valueOf(prevLine.split(" ")[0]), 
-					BipartiteGraphMaximumCardinalityMatcher.getInstance(Graph.readGraph(new Scanner(testFile), false), DebugLevel.ERROR).performMaximumMatching());
+					BipartiteGraphMaximumCardinalityMatcher.getInstance(Graph.readGraph(new Scanner(testFile), false), debugLevel).performMaximumMatching());
 		}
 	
 	}
@@ -114,9 +121,8 @@ public class BipartiteGraphMaximumCardinalityMatcherTest {
 	
 	@Test
 	public void testBipartiteSpecific() throws FileNotFoundException {
-//		File file = new File (testsDirectory + "bip2.txt");
-		File file = new File (testsDirectory + "test-case-5.txt");
-		assertEquals(Integer.valueOf(35), 
+		File file = new File (testsDirectory + "bip3.txt");
+		assertEquals(Integer.valueOf(9924), 
 				BipartiteGraphMaximumCardinalityMatcher.getInstance(Graph.readGraph(new Scanner(file), false), DebugLevel.ERROR).performMaximumMatching());
 	}
 	

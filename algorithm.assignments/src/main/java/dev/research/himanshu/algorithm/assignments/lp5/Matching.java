@@ -1,5 +1,8 @@
 package dev.research.himanshu.algorithm.assignments.lp5;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * a class depicting the behavior of matching.
  * 
@@ -7,23 +10,27 @@ package dev.research.himanshu.algorithm.assignments.lp5;
  */
 public class Matching {
 	
-	private int id;					// matching clas id.
-	private Vertex startingNode;	// starting point of the matching.
-	private Vertex tailNode;		// last attached point of the matching.
-	private int weight;				// current size of the matching.
-	private boolean isAugmenting; 	// flag to hold information whether this matching is augmenting or not.
-	private boolean active;       	// flag to hold information whether Matching is currently actively building or not.
+	private int id;								// matching clas id.
+	private Vertex startingNode;				// starting point of the matching.
+	private Vertex tailNode;					// last attached point of the matching.
+	private List<Edge> matchedEdges; 			// list of matched edges.	
+	private int weight;							// current size of the matching.
+	private boolean isAugmenting; 				// flag to hold information whether this matching is augmenting or not.
+	private boolean active;       				// flag to hold information whether Matching is currently actively building or not.
+	private int cardinality;					// variable to store the current cardinality of the matching.
 	
 	/**
 	 * constructor.
 	 * 
 	 * @param startingNode
 	 */
-	public Matching (Vertex startingNode) {		
-		this.active = (startingNode.parent == null);
+	public Matching (Vertex startingNode) {
+		this.id = startingNode.name;
+		this.active = (startingNode.matching == null);
+		startingNode.matching = this;
+		this.matchedEdges = new ArrayList<>();
 		this.startingNode = startingNode;
 		this.tailNode = startingNode;
-		this.id = startingNode.name;
 	}
 
 	/**
@@ -81,105 +88,93 @@ public class Matching {
 	}
 	
 	/**
+	 * 'cardinality' getter method
+	 * 
+	 * @return
+	 */
+	public int getCardinality() {
+		return cardinality;
+	}
+	
+	/**
+	 * 'matchedEdges' getter method
+	 * 
+	 * @return
+	 */
+	public List<Edge> getMatchedEdges() {
+		return matchedEdges;
+	}
+	
+	/**
 	 * method to add a vertex to the matching. 
 	 * 
 	 * @param vertex
 	 * @return
 	 */
 	public boolean addMate(Vertex vertex) {
+		
 		// precautionary check : the incoming node should have a valid layer value.
 		if (vertex.layer == null || (vertex.layer != null && vertex.layer == tailNode.layer))
 			return false;
 		
-		tailNode.mate = vertex;
-		vertex.parent = tailNode;
+		System.out.println(" adding vertex : " + vertex + " tail node : " + getTailNode());
 		
-		System.out.println("adding mate of : " + tailNode + " -> " + vertex);
-		
-		// make edge 'matching' if the connection is getting made from inner node to outer node.
-		if (tailNode.layer.isInner()) {
-			for (Edge edge : tailNode.Adj) {
-				if (edge.otherEnd(tailNode) == vertex) {
-					edge.matched = true;			
-					weight += edge.Weight;			// increment weight of the matching.
-					break;
-				}
-			}
-			
-			isAugmenting = true;					// matching augmenting, hence accepting inner nodes at the moment.
-		} else
-			isAugmenting = false;					// case : addition of an inner node, matching not augmenting at the moment.
-		
-		tailNode = vertex;							// update the tail node.
-		return true;
-	}
-	
-	/**
-	 * method to merge two matchings.
-	 * 
-	 * @param withMatching
-	 * @return
-	 */
-	public boolean merge (Matching withMatching) {
 		Edge connectingEdge = null;
-		
-		// check to ensure that we can append the current matching with the 'withMatching' matching. 
 		for (Edge edge : tailNode.Adj) {
-			if (edge.otherEnd(tailNode) == withMatching.startingNode) {
-				connectingEdge = edge;
+			if (edge.otherEnd(tailNode) == vertex) {
+				connectingEdge = edge; 
+//				weight += edge.Weight;			// increment weight of the matching.
 				break;
 			}
 		}
 		
-		// successful : proceed with the merge.
-		if (connectingEdge != null) {
-			if (!isAugmenting)
-				weight += connectingEdge.Weight;
-			
-			weight += withMatching.weight;
-			
-			withMatching.startingNode.parent = tailNode;
-			tailNode = withMatching.tailNode;
-			isAugmenting = withMatching.isAugmenting;
-		}
+		// make edge 'matching' if the connection is getting made from inner node to outer node.
+		if (tailNode.layer.isOuter()) {	
+			cardinality ++;
+			isAugmenting = false;					// case : addition of an inner node, matching not augmenting at the moment.
+		} else {
+			connectingEdge.matched = true;
+			isAugmenting = true;
+		}	
 		
-		return (connectingEdge == null ? false : true);
+		getMatchedEdges().add(connectingEdge);
+		tailNode = vertex;							// update the tail node.
+		
+		return true;
 	}
 	
+
 	@Override
 	public String toString() {
-		return "[" + id + " : " + weight + "]";
+		return "[" + id + " : " + cardinality + "]";
 	}
 	
 	/**
 	 * method to print the matching sequence.
 	 */
 	public void print() {
-		Vertex traversingNode = startingNode;
-		
-		StringBuffer buffer = new StringBuffer();
-		while (traversingNode != tailNode) {
-			buffer.append(traversingNode.name).append(" ");
-			
-			if (traversingNode.layer.isInner())
-				buffer.append("\n");
-			
-			traversingNode = traversingNode.mate;
+		for (Edge edge : getMatchedEdges()) {
+			// print only the visible edges
+			if (!edge.matched) 
+				System.out.println(edge);
 		}
-		
-		System.out.println(buffer.toString());
 	}
 	
 	/**
 	 * function to make the current matching augmenting by reversing the layering information.
-	 
-	public void makeAugmenting() {
+	 */
+	public void build() {
 		Vertex vertex = tailNode;
-		while (vertex != null) {
+		while (tailNode != null) {
 			vertex.layer = vertex.layer.other();
 			vertex = vertex.parent;
 		}
 	}
-	*/
+	
+	public void buildRecursively (Vertex vertex) {
+		if (vertex.Adj.size() == 0) {
+			active = false;
+		}
+	}
 	
 }

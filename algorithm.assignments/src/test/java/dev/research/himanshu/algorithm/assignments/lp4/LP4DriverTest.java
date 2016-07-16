@@ -52,11 +52,11 @@ public class LP4DriverTest {
 		LP4Driver.main(new String[] { inputDirectory + file });
 	}
 	
-	@Test @Ignore
+	@Test
 	public void testCustomRunBad() throws Exception {
 		String file = "lp4-bad.txt";
 		System.out.println(" >> executing file : " + file + " , expected : 1016105017.96 OR 1016105033.26 ");
-		LP4VerboseDriver.main(new String[] { inputDirectory + file });
+		LP4Driver.main(new String[] { inputDirectory + file });
 	}
 	
 	/* test data */

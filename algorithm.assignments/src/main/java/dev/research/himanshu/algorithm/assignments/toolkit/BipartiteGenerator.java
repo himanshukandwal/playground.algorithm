@@ -14,6 +14,25 @@ public class BipartiteGenerator {
 //		buildFullyGeneratedGraph(100);
 //		buildFullyGeneratedGraph(1000);
 //		buildFullyGeneratedGraph(10000);
+		
+		otherLogic(90000);
+	}
+	
+	public static void otherLogic (int range) {
+		StringBuffer buffer = new StringBuffer();
+		
+		int index = 0;
+		int count = 0;
+		for (index = 3; index < range; index += 2, count += 3) {
+			buffer.append((index - 2) + " " + (index - 1) + " " + 1).append("\n");
+			buffer.append((index - 2) + " " + (index + 1) + " " + 1).append("\n");
+			buffer.append((index) + " " + (index - 1) + " " + 1).append("\n");
+		}
+		count ++;
+		buffer.append((index - 2) + " " + (index - 1) + " " + 1).append("\n");
+		
+		System.out.println(range + " " + count);
+		System.out.println(buffer.toString());
 	}
 	
 	public static void buildFullyGeneratedGraph(int nodes) {
